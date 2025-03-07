@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Link, Redirect, Tabs } from 'expo-router';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import Colors from '@/constants/Colors';
+import { useAuthStore } from '@/lib/AuthStore';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
@@ -17,6 +18,28 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  // const { hasStarted, setHasStarted } = useAuthStore();
+
+
+  const { user, loading, initializeAuth } = useAuthStore();
+  // Initialize auth state on mount
+  useEffect(() => {
+    initializeAuth();
+  }, []);
+
+  // Show a loading indicator while checking auth state
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  // Redirect if not authenticated
+  if (!user) {
+    return <Redirect href="/start" />;
+  }
 
   return (
     <Tabs
@@ -25,6 +48,16 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        tabBarStyle: {
+          borderTopLeftRadius: 40, // Add top border radius
+          borderTopRightRadius: 40,
+          backgroundColor: 'white', // Tab bar background color
+          height: 80, // Adjust height if needed
+          position: 'absolute', // Optional: Makes the tab bar float
+        },
+        tabBarItemStyle: {
+          marginBottom: 6, // Adjust spacing for icons/labels
+        },
       }}>
       <Tabs.Screen
         name="index"
