@@ -6,9 +6,18 @@ import { useAuthStore } from './AuthStore';
 
 interface Post {
     id: string;
-    content: string;
+    title: string;
     user_id: string;
+    description: string;
+    image_url?: string;
     created_at: string;
+}
+
+interface PostAddOrEdit {
+    title: string;
+    description: string;
+    image_url?: string;
+    user_id: string;
 }
 
 interface PostState {
@@ -16,7 +25,7 @@ interface PostState {
     loading: boolean;
     error: string | null;
     fetchPosts: () => Promise<void>;
-    createPost: (content: string) => Promise<void>;
+    createPost: (content: PostAddOrEdit) => Promise<void>;
     deletePost: (postId: string) => Promise<void>;
 }
 
@@ -30,7 +39,7 @@ export const usePostStore = create<PostState>()(
                 set({ loading: true, error: null });
                 try {
                     const { data, error } = await supabase
-                        .from('posts')
+                        .from('recycle_post')
                         .select('*')
                         .order('created_at', { ascending: false });
 
@@ -42,15 +51,15 @@ export const usePostStore = create<PostState>()(
                     set({ loading: false });
                 }
             },
-            createPost: async (content: string) => {
+            createPost: async (content: PostAddOrEdit) => {
                 const { user } = useAuthStore.getState(); // Access auth store
                 if (!user) throw new Error('User not authenticated');
 
                 set({ loading: true, error: null });
                 try {
                     const { data, error } = await supabase
-                        .from('posts')
-                        .insert([{ content, user_id: user.id }])
+                        .from('recycle_post')
+                        .insert([{ ...content, user_id: user.id }])
                         .select();
 
                     if (error) throw error;
@@ -65,7 +74,7 @@ export const usePostStore = create<PostState>()(
                 set({ loading: true, error: null });
                 try {
                     const { error } = await supabase
-                        .from('posts')
+                        .from('recycle_post')
                         .delete()
                         .eq('id', postId);
 
