@@ -1,80 +1,122 @@
-import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuthStore } from '@/lib/AuthStore';
 import { View, TextInput, Pressable, Alert, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { Link, router } from 'expo-router';
-import { useAuthStore } from '@/lib/AuthStore';
 import Colors from '@/constants/Colors';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
+
+const SignupSchema = z
+    .object({
+        email: z.string().email('Invalid email'),
+        password: z.string().min(9, 'Password must be at least 9 characters'),
+        confirmPassword: z.string().min(9, 'Password must be at least 9 characters'),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+    });
 
 export default function Signup() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const { signup, loading } = useAuthStore();
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({ resolver: zodResolver(SignupSchema) });
 
-    const handleSignup = async () => {
-        if (password !== confirmPassword) {
-            Alert.alert('Passwords do not match');
-            return;
-        }
+    const onSubmit = async (data: { email: string; password: string; confirmPassword: string }) => {
         try {
-            await signup(email, password);
+            await signup(data.email, data.password);
             router.replace('/(tabs)');
         } catch (error) {
-            if (error instanceof Error) {
-                Alert.alert('Signup Failed', error.message);
-            } else {
-                Alert.alert('Signup Failed', 'An unknown error occurred');
-            }
+            Alert.alert('Signup Failed', error instanceof Error ? error.message : 'Unknown error');
         }
     };
 
     return (
         <View style={styles.container}>
-            <Image
-                source={require('../assets/images/logo.svg')}
-                style={styles.logo}
-                cachePolicy="memory-disk"
-                contentFit="contain"
-            />
+            <View style={styles.topContainer}>
+                <Pressable onPress={() => router.push('/start')} style={styles.backButton}>
+                    <FontAwesome name="arrow-left" size={24} color={Colors.light.text} />
+                </Pressable>
+                <Image
+                    source={require('../assets/images/logo.svg')}
+                    style={styles.logo}
+                    cachePolicy="memory-disk"
+                    contentFit="contain"
+                />
+            </View>
             <View style={styles.welcomeContainer}>
                 <Text style={styles.welcomeText}>Create Account</Text>
                 <Text style={styles.subText}>Sign up to get started</Text>
             </View>
             <Text style={styles.label}>Email</Text>
-            <TextInput
-                value={email}
-                onChangeText={setEmail}
-                style={styles.input}
-                placeholderTextColor={Colors.light.text}
+            <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        placeholder="Enter email"
+                        style={styles.input}
+                        placeholderTextColor={Colors.light.text}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                    />
+                )}
             />
+            {errors.email && <Text style={{ color: 'red' }}>{errors.email.message}</Text>}
+
             <Text style={styles.label}>Password</Text>
-            <TextInput
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                style={styles.input}
-                placeholderTextColor={Colors.light.text}
+            <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        secureTextEntry
+                        placeholder="Enter password"
+                        style={styles.input}
+                        placeholderTextColor={Colors.light.text}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                    />
+                )}
             />
+            {errors.password && <Text style={{ color: 'red' }}>{errors.password.message}</Text>}
+
             <Text style={styles.label}>Confirm Password</Text>
-            <TextInput
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                style={styles.input}
-                placeholderTextColor={Colors.light.text}
+            <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        secureTextEntry
+                        placeholder="Confirm password"
+                        style={styles.input}
+                        placeholderTextColor={Colors.light.text}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                    />
+                )}
             />
+            {errors.confirmPassword && <Text style={{ color: 'red' }}>{errors.confirmPassword.message}</Text>}
+
             <View style={styles.buttonContainer}>
-                <Pressable onPress={handleSignup} style={styles.button}>
-                    {loading ? (
-                        <ActivityIndicator color={Colors.light.text} />
-                    ) : (
-                        <Text style={styles.buttonText}>Sign Up</Text>
-                    )}
+                <Pressable onPress={handleSubmit(onSubmit)} style={styles.button}>
+                    {loading ? <ActivityIndicator color={Colors.light.text} /> : <Text style={styles.buttonText}>Sign Up</Text>}
                 </Pressable>
             </View>
             <View style={styles.linkContainer}>
                 <Text style={styles.linkText}>Already have an account?</Text>
-                <Link href="/login" style={styles.link}>Login</Link>
+                <Link href="/login" style={styles.link}>
+                    Login
+                </Link>
             </View>
         </View>
     );
@@ -89,12 +131,27 @@ const styles = StyleSheet.create({
         paddingTop: '30%',
         backgroundColor: Colors.light.background,
     },
-    logo: {
+    topContainer: {
         position: 'absolute',
-        top: 0,
-        right: 16,
-        width: '15%',
-        height: '15%',
+        top: 40,
+        left: 24,
+        right: 24,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        zIndex: 1,
+    },
+    backButton: {
+        padding: 8,
+    },
+    backButtonText: {
+        fontSize: 18,
+        color: Colors.light.text,
+        fontWeight: 'bold',
+    },
+    logo: {
+        width: 60,
+        height: 60,
     },
     welcomeContainer: {
         marginBottom: 24,
