@@ -37,13 +37,13 @@ export default function Login() {
     }
 
     if (user) {
-        return <Redirect href="/(tabs)" />;
+        return <Redirect href="/(tabs)/index" />;
     }
 
     const onSubmit = async (data: LoginFormData) => {
         try {
             await login(data.email, data.password);
-            router.replace('/(tabs)');
+            router.replace('/(tabs)/index');
         } catch (error) {
             if (error instanceof Error) {
                 Alert.alert('Login Failed', error.message);
@@ -107,7 +107,6 @@ export default function Login() {
                 )}
             />
             {errors.password && <Text style={{ color: 'red' }}>{errors.password.message}</Text>}
-
             <View style={styles.buttonContainer}>
                 <Pressable onPress={handleSubmit(onSubmit)} style={styles.button}>
                     <Text style={styles.buttonText}>Login</Text>
