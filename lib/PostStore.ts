@@ -27,6 +27,8 @@ interface PostState {
     fetchPosts: () => Promise<void>;
     createPost: (content: PostAddOrEdit) => Promise<void>;
     deletePost: (postId: string) => Promise<void>;
+    findPost: (postId: string) => Post | undefined;
+    updatePost: (postId: string, content: PostAddOrEdit) => Promise<void>;
 }
 
 export const usePostStore = create<PostState>()(
@@ -86,6 +88,31 @@ export const usePostStore = create<PostState>()(
                     set({ loading: false });
                 }
             },
+            findPost: (postId: string) => {
+                return get().posts.find(post => post.id == postId);
+            },
+            updatePost: async (postId: string, content: PostAddOrEdit) => {
+                set({ loading: true, error: null });
+                try {
+                    const { data, error } = await supabase
+                        .from('recycle_post')
+                        .update(content)
+                        .eq('id', postId)
+                        .select();
+
+                    if (error) throw error;
+
+                    set({
+                        posts: get().posts.map(post =>
+                            post.id === postId ? data[0] : post
+                        ),
+                    });
+                } catch (err) {
+                    set({ error: (err as Error).message });
+                } finally {
+                    set({ loading: false });
+                }
+            },
         }),
         {
             name: 'post-storage', // Unique key for SecureStore
@@ -104,6 +131,8 @@ export const usePostStore = create<PostState>()(
                 fetchPosts: state.fetchPosts,
                 createPost: state.createPost,
                 deletePost: state.deletePost,
+                findPost: state.findPost,
+                updatePost: state.updatePost,
             }), // Only persist posts
         }
     )
