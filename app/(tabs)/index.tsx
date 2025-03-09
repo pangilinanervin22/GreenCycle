@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View, Pressable } from 'react-native';
 import { useAuthStore } from '@/lib/AuthStore';
 import { router } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
@@ -34,7 +34,7 @@ export default function TabOneScreen() {
       {!loading &&
         !error &&
         posts?.map((post, i) => (
-          <View key={i} style={styles.postContainer}>
+          <Pressable key={i} onPress={() => router.push(`/(tabs)/${post.id}`)} style={styles.postContainer}>
             <Image
               source={{ uri: post.image_url }}
               style={styles.postImage}
@@ -42,7 +42,7 @@ export default function TabOneScreen() {
             />
             <Text style={[styles.title, styles.postTitle]}>{post.title}</Text>
             <Text style={styles.body}>{post.description}</Text>
-          </View>
+          </Pressable>
         ))}
 
       <Button title="Logout" onPress={handleLogout} />
@@ -82,8 +82,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-
-
   postContainer: {
     width: '100%',
     marginVertical: 10,
