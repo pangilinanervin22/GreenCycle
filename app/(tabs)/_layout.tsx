@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Redirect, Tabs } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
+import { Redirect, router, Tabs } from 'expo-router';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { useAuthStore } from '@/lib/AuthStore';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { Image } from 'expo-image';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -38,7 +39,6 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarShowLabel: true,
-        headerShown: useClientOnlyValue(false, true),
         tabBarActiveTintColor: 'green',
         tabBarStyle: {
           borderTopLeftRadius: 40,
@@ -54,30 +54,59 @@ export default function TabLayout() {
         name="index"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-          headerShown: false,
-          title: 'Home',
+          header: () => null // Proper way to hide tab header
+
         }}
       />
       <Tabs.Screen
-        name="like"
+        name="post"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
-          headerShown: false,
-          title: 'Likes',
+          headerLeft: () => (
+            <FontAwesome
+              name="arrow-left"
+              size={30}
+              style={{ marginLeft: 30, color: "red" }}
+              onPress={() => router.push('/(tabs)')}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
-          title: 'Profile',
+          header: () => null // Proper way to hide tab header
+
         }}
       />
       <Tabs.Screen
         name="edit"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
-          title: 'Edit',
+          headerRight: () => (
+            <Pressable onPress={() => router.push('/(tabs)/post')}>
+              <Image source={require('../../assets/images/logo_white.svg')}
+                cachePolicy="memory-disk"
+                contentFit="contain"
+                style={{ width: 40, height: 40, marginRight: 20 }}
+              />
+            </Pressable>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="[id]"
+        options={{
+          href: null,
+          headerLeft: () => (
+            <FontAwesome
+              name="arrow-left"
+              size={60}
+              style={{ marginLeft: 30, color: "red" }}
+              onPress={() => router.push('/(tabs)')}
+            />
+          ),
         }}
       />
     </Tabs>
