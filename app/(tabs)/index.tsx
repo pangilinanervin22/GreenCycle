@@ -7,7 +7,7 @@ import { Image } from 'expo-image';
 
 export default function TabOneScreen() {
   const { logout } = useAuthStore();
-  const { fetchPosts, posts, loading, error } = usePostStore();
+  const { fetchPosts, posts, loading } = usePostStore();
 
   useEffect(() => {
     fetchPosts();
@@ -30,9 +30,7 @@ export default function TabOneScreen() {
       </View>
 
       {loading && <Text>Loading...</Text>}
-      {error && <Text>Error: {error}</Text>}
       {!loading &&
-        !error &&
         posts?.map((post, i) => (
           <Pressable key={i} onPress={() => router.push(`/(tabs)/${post.id}`)} style={styles.postContainer}>
             <Image
