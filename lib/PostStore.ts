@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { supabase } from './supabase';
 import { useAuthStore } from './AuthStore';
 
-interface Post {
+export interface Post {
     id: string;
     title: string;
     author_id: string;
@@ -17,10 +17,9 @@ interface Post {
     status: "REQUESTING" | "ACCEPTED" | "REJECTED";
 }
 
-interface PostAddOrEdit {
+export interface PostAddOrEdit {
     title: string;
     description: string;
-    user_id: string;
     image_url?: string;
     ingredients: string[];
 }
@@ -28,7 +27,6 @@ interface PostAddOrEdit {
 interface PostState {
     posts: Post[];
     loading: boolean;
-    error: string | null;
     fetchPosts: () => Promise<void>;
     createPost: (content: PostAddOrEdit) => Promise<void>;
     deletePost: (postId: string) => Promise<void>;
@@ -41,9 +39,8 @@ export const usePostStore = create<PostState>()(
         (set, get) => ({
             posts: [],
             loading: false,
-            error: null,
             fetchPosts: async () => {
-                set({ loading: true, error: null });
+                set({ loading: true });
                 try {
                     const { data, error } = await supabase
                         .from('recycle_post')
@@ -55,8 +52,6 @@ export const usePostStore = create<PostState>()(
 
                     if (error) throw error;
                     set({ posts: data || [] });
-                } catch (err: any) {
-                    set({ error: err?.message || 'An error occurred while fetching posts' });
                 } finally {
                     set({ loading: false });
                 }
@@ -65,7 +60,7 @@ export const usePostStore = create<PostState>()(
                 const { user } = useAuthStore.getState(); // Access auth store
                 if (!user) throw new Error('User not authenticated');
 
-                set({ loading: true, error: null });
+                set({ loading: true });
                 try {
                     const createdPost = {
                         user_id: user.id,
@@ -85,14 +80,12 @@ export const usePostStore = create<PostState>()(
 
                     if (error) throw error;
                     set({ posts: [data[0], ...get().posts] });
-                } catch (err: any) {
-                    set({ error: err?.message || 'An error occurred while creating the post' });
                 } finally {
                     set({ loading: false });
                 }
             },
             deletePost: async (postId: string) => {
-                set({ loading: true, error: null });
+                set({ loading: true });
                 try {
                     const { error } = await supabase
                         .from('recycle_post')
@@ -101,8 +94,6 @@ export const usePostStore = create<PostState>()(
 
                     if (error) throw error;
                     set({ posts: get().posts.filter((post) => post.id !== postId) });
-                } catch (err: any) {
-                    set({ error: err?.message || 'An error occurred while deleting the post' });
                 } finally {
                     set({ loading: false });
                 }
@@ -111,7 +102,7 @@ export const usePostStore = create<PostState>()(
                 return get().posts.find(post => post.id == postId);
             },
             updatePost: async (postId: string, content: PostAddOrEdit) => {
-                set({ loading: true, error: null });
+                set({ loading: true });
                 try {
                     const { data, error } = await supabase
                         .from('recycle_post')
@@ -126,8 +117,6 @@ export const usePostStore = create<PostState>()(
                             post.id === postId ? data[0] : post
                         ),
                     });
-                } catch (err: any) {
-                    set({ error: err?.message || 'An error occurred while updating the post' });
                 } finally {
                     set({ loading: false });
                 }
@@ -146,7 +135,6 @@ export const usePostStore = create<PostState>()(
             partialize: (state) => ({
                 posts: state.posts,
                 loading: state.loading,
-                error: state.error,
                 fetchPosts: state.fetchPosts,
                 createPost: state.createPost,
                 deletePost: state.deletePost,
