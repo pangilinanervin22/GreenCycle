@@ -6,7 +6,6 @@ import { Button } from 'react-native';
 export default function LikePage() {
   const router = useRouter();
 
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Like Page</Text>

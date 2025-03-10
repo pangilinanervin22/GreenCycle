@@ -7,7 +7,7 @@ export default function EditPage() {
     const router = useRouter();
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Edit Page</Text>
+            <Text style={styles.title}>Edit Page halo</Text>
             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
             <Button
                 title="Go to Home"
