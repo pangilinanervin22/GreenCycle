@@ -61,3 +61,5 @@ const styles = StyleSheet.create({
         color: '#000',
     },
 });
+
+'/post/2'
