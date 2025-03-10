@@ -81,12 +81,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="edit"
+        name="create"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
           headerRight: () => (
-            <Pressable onPress={() => router.push('/(tabs)/post')}>
-              <Image source={require('../../assets/images/logo_white.svg')}
+            <Pressable onPress={() => router.push('/(tabs)')}>
+              <Image source={require('../../assets/images/logo.svg')}
                 cachePolicy="memory-disk"
                 contentFit="contain"
                 style={{ width: 40, height: 40, marginRight: 20 }}

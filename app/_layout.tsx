@@ -65,7 +65,9 @@ function RootLayoutNav() {
       >
         <Stack.Screen
           name="(tabs)"
-          options={{ animation: 'fade' }}
+          options={{
+            animation: 'fade', headerShown: false,
+          }}
         />
         <Stack.Screen
           name="modal"
