@@ -7,17 +7,22 @@ import { useAuthStore } from './AuthStore';
 interface Post {
     id: string;
     title: string;
-    user_id: string;
+    author_id: string;
+    author_name: string;
     description: string;
-    image_url?: string;
+    likes: number;
+    image_url: string;
+    ingredients: string[];
     created_at: string;
+    status: "REQUESTING" | "ACCEPTED" | "REJECTED";
 }
 
 interface PostAddOrEdit {
     title: string;
     description: string;
-    image_url?: string;
     user_id: string;
+    image_url?: string;
+    ingredients: string[];
 }
 
 interface PostState {
@@ -42,13 +47,16 @@ export const usePostStore = create<PostState>()(
                 try {
                     const { data, error } = await supabase
                         .from('recycle_post')
-                        .select('*')
+                        .select(`
+                            *,
+                            likes(count)
+                        `)
                         .order('created_at', { ascending: false });
 
                     if (error) throw error;
                     set({ posts: data || [] });
-                } catch (err) {
-                    set({ error: (err as Error).message });
+                } catch (err: any) {
+                    set({ error: err?.message || 'An error occurred while fetching posts' });
                 } finally {
                     set({ loading: false });
                 }
@@ -59,15 +67,26 @@ export const usePostStore = create<PostState>()(
 
                 set({ loading: true, error: null });
                 try {
+                    const createdPost = {
+                        user_id: user.id,
+                        author_name: user.name,
+                        ingredients: [...content.ingredients],
+                        description: content.description,
+                        title: content.title,
+                        image_url: content.image_url,
+                        likes: 0,
+                        status: "REQUESTING"
+                    };
+
                     const { data, error } = await supabase
                         .from('recycle_post')
-                        .insert([{ ...content, user_id: user.id }])
+                        .insert(createdPost)
                         .select();
 
                     if (error) throw error;
                     set({ posts: [data[0], ...get().posts] });
-                } catch (err) {
-                    set({ error: (err as Error).message });
+                } catch (err: any) {
+                    set({ error: err?.message || 'An error occurred while creating the post' });
                 } finally {
                     set({ loading: false });
                 }
@@ -82,8 +101,8 @@ export const usePostStore = create<PostState>()(
 
                     if (error) throw error;
                     set({ posts: get().posts.filter((post) => post.id !== postId) });
-                } catch (err) {
-                    set({ error: (err as Error).message });
+                } catch (err: any) {
+                    set({ error: err?.message || 'An error occurred while deleting the post' });
                 } finally {
                     set({ loading: false });
                 }
@@ -107,8 +126,8 @@ export const usePostStore = create<PostState>()(
                             post.id === postId ? data[0] : post
                         ),
                     });
-                } catch (err) {
-                    set({ error: (err as Error).message });
+                } catch (err: any) {
+                    set({ error: err?.message || 'An error occurred while updating the post' });
                 } finally {
                     set({ loading: false });
                 }
