@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { View, TextInput, Pressable, Alert, StyleSheet, Text, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { Image } from 'expo-image';
 import { Link, Redirect, router } from 'expo-router';
 import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -7,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from '@/lib/AuthStore';
 import Colors from '@/constants/Colors';
 import { FontAwesome } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 
 const loginSchema = z.object({
     email: z.string().email('Invalid email address').nonempty('Email is required'),
@@ -37,13 +37,13 @@ export default function Login() {
     }
 
     if (user) {
-        return <Redirect href="/(tabs)/index" />;
+        return <Redirect href="/(tabs)" />;
     }
 
     const onSubmit = async (data: LoginFormData) => {
         try {
             await login(data.email, data.password);
-            router.replace('/(tabs)/index');
+            router.replace('/(tabs)');
         } catch (error) {
             if (error instanceof Error) {
                 Alert.alert('Login Failed', error.message);

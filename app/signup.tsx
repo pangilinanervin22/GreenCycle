@@ -8,9 +8,9 @@ import { Link, router } from 'expo-router';
 import Colors from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-
 const SignupSchema = z
     .object({
+        name: z.string().min(2, 'Name must be at least 2 characters'),
         email: z.string().email('Invalid email'),
         password: z.string().min(9, 'Password must be at least 9 characters'),
         confirmPassword: z.string().min(9, 'Password must be at least 9 characters'),
@@ -21,16 +21,16 @@ const SignupSchema = z
     });
 
 export default function Signup() {
-    const { signup, loading } = useAuthStore();
+    const { signup, loading, } = useAuthStore();
     const {
         control,
         handleSubmit,
         formState: { errors },
     } = useForm({ resolver: zodResolver(SignupSchema) });
 
-    const onSubmit = async (data: { email: string; password: string; confirmPassword: string }) => {
+    const onSubmit = async (data: { name: string; email: string; password: string; confirmPassword: string }) => {
         try {
-            await signup(data.email, data.password);
+            await signup(data.email, data.password, data.name);
             router.replace('/(tabs)');
         } catch (error) {
             Alert.alert('Signup Failed', error instanceof Error ? error.message : 'Unknown error');
@@ -54,6 +54,24 @@ export default function Signup() {
                 <Text style={styles.welcomeText}>Create Account</Text>
                 <Text style={styles.subText}>Sign up to get started</Text>
             </View>
+
+            <Text style={styles.label}>Name</Text>
+            <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        placeholder="Enter your name"
+                        style={styles.input}
+                        placeholderTextColor={Colors.light.text}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                    />
+                )}
+            />
+            {errors.name && <Text style={{ color: 'red' }}>{errors.name.message}</Text>}
+
             <Text style={styles.label}>Email</Text>
             <Controller
                 control={control}
@@ -105,11 +123,17 @@ export default function Signup() {
                     />
                 )}
             />
-            {errors.confirmPassword && <Text style={{ color: 'red' }}>{errors.confirmPassword.message}</Text>}
+            {errors.confirmPassword && (
+                <Text style={{ color: 'red' }}>{errors.confirmPassword.message}</Text>
+            )}
 
             <View style={styles.buttonContainer}>
                 <Pressable onPress={handleSubmit(onSubmit)} style={styles.button}>
-                    {loading ? <ActivityIndicator color={Colors.light.text} /> : <Text style={styles.buttonText}>Sign Up</Text>}
+                    {loading ? (
+                        <ActivityIndicator color={Colors.light.text} />
+                    ) : (
+                        <Text style={styles.buttonText}>Sign Up</Text>
+                    )}
                 </Pressable>
             </View>
             <View style={styles.linkContainer}>
