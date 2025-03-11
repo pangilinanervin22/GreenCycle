@@ -10,7 +10,10 @@ export interface Post {
     author_id: string;
     author_name: string;
     description: string;
-    likes: number;
+    likes: {
+        count: number;
+        users: string[];
+    };
     image_url: string;
     ingredients: string[];
     created_at: string;
@@ -46,7 +49,7 @@ export const usePostStore = create<PostState>()(
                         .from('recycle_post')
                         .select(`
                             *,
-                            likes(count)
+                            likes:likes(count)
                         `)
                         .order('created_at', { ascending: false });
 
