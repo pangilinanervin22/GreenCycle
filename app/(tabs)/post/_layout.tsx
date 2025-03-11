@@ -1,37 +1,24 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Alert, Pressable, Text, View } from "react-native";
 import { useNavigation } from "expo-router";
 
 export default function PostLayout() {
-    const navigation = useNavigation();
+    const router = useRouter();
 
     return (
         <Stack
             screenOptions={{
-                headerTitleAlign: 'center',
-                headerBackVisible: false,
+                headerTitleStyle: {
+                    color: 'black',
+                    fontSize: 18
+                }
             }}
         >
             <Stack.Screen
                 name="index"
                 options={{
                     title: 'All Posts',
-                    headerLeft: () => (
-                        <View style={{ marginLeft: 16, zIndex: 99 }}>
-                            <Pressable
-                                onPress={() => { navigation.goBack(); Alert.alert('Back pressed!'); }}
-                                style={({ pressed }) => ({
-                                    opacity: pressed ? 0.5 : 1,
-                                    padding: 10,
-                                    backgroundColor: 'red', // Visual debug
-                                    borderRadius: 5
-                                })}
-                                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-                            >
-                                <Text style={{ fontSize: 16 }}>Back</Text>
-                            </Pressable>
-                        </View>
-                    )
+                    header: () => null,
                 }}
             />
             <Stack.Screen
@@ -40,7 +27,7 @@ export default function PostLayout() {
                     title: 'Post Details',
                     headerLeft: () => (
                         <Pressable
-                            onPress={() => navigation.goBack()}
+                            onPress={() => router.back()}
                             style={({ pressed }) => ({
                                 opacity: pressed ? 0.5 : 1,
                                 padding: 102,
