@@ -1,39 +1,56 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Pressable } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Redirect, router, Tabs } from 'expo-router';
-import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { useAuthStore } from '@/lib/AuthStore';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-import { Image } from 'expo-image';
+import DefaultLoading from '@/components/DefaultLoading';
+import DefaultTitleHeader from '@/components/DefaultHeader';
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={30} style={{ color: props.color, position: "absolute", }} {...props} />;
+function AnimatedBackButton() {
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.9,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return (
+    <Pressable
+      onPress={() => router.back()}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={{ padding: 20 }}
+    >
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+        <FontAwesome name="arrow-left" size={24} color="#00512C" />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>['name']; color: string }) {
+  return <FontAwesome size={28} style={{ color: props.color, position: 'absolute' }} {...props} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const { user, loading, initializeAuth } = useAuthStore();
 
   useEffect(() => {
     initializeAuth();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
-  if (!user) {
-    return <Redirect href="/start" />;
-  }
+  if (loading) return <DefaultLoading loading={loading} />;
+  if (!user) return <Redirect href="/start" />;
 
   return (
     <Tabs
@@ -44,69 +61,59 @@ export default function TabLayout() {
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           backgroundColor: 'white',
-          height: 80,
+          height: 60,
           position: 'absolute',
-          paddingTop: 10,
+          paddingTop: 5,
+        },
+        headerTitleAlign: 'center',
+        headerStyle: {
+          backgroundColor: '#ECE9E5',
+          elevation: 0,
+          height: 70,
+          width: '100%',
+          flexDirection: 'row',
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-          header: () => null // Proper way to hide tab header
-
+          header: () => null,
         }}
       />
       <Tabs.Screen
         name="post"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
-          headerLeft: () => (
-            <FontAwesome
-              name="arrow-left"
-              size={30}
-              style={{ marginLeft: 30, color: "red" }}
-              onPress={() => router.push('/(tabs)')}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
-          header: () => null // Proper way to hide tab header
-
+          tabBarIcon: ({ color }) => <TabBarIcon name="leaf" color={color} />,
+          headerTitle: () => <DefaultTitleHeader />,
+          headerLeft: () => <AnimatedBackButton />,
         }}
       />
       <Tabs.Screen
         name="create"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
-          headerRight: () => (
-            <Pressable onPress={() => router.push('/(tabs)')}>
-              <Image source={require('../../assets/images/logo.svg')}
-                cachePolicy="memory-disk"
-                contentFit="contain"
-                style={{ width: 40, height: 40, marginRight: 20 }}
-              />
-            </Pressable>
-          ),
+          headerTitle: () => <DefaultTitleHeader />,
+          headerLeft: () => <AnimatedBackButton />,
         }}
       />
       <Tabs.Screen
         name="[id]"
         options={{
+          title: 'Profile',
           href: null,
-          headerLeft: () => (
-            <FontAwesome
-              name="arrow-left"
-              size={60}
-              style={{ marginLeft: 30, color: "red" }}
-              onPress={() => router.push('/(tabs)')}
-            />
-          ),
+          headerTitle: () => <DefaultTitleHeader />,
+          headerLeft: () => <AnimatedBackButton />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          headerTitle: () => <DefaultTitleHeader />,
+          headerLeft: () => <AnimatedBackButton />,
         }}
       />
     </Tabs>
