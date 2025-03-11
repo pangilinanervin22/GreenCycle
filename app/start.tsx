@@ -22,7 +22,7 @@ export default function StartTab() {
             </View>
             <View style={styles.buttonContainer}>
                 <Link href="/login" style={styles.transparentButton}>
-                    <Text style={styles.buttonText}>LOGIN</Text>
+                    <Text style={styles.buttonTextLogin}>LOGIN</Text>
                 </Link>
                 <Link href="/signup" style={styles.button}>
                     <Text style={styles.buttonText}>SIGNUP</Text>
@@ -90,6 +90,10 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#FFFFFF',
+        fontWeight: 'bold',
+    },
+    buttonTextLogin: {
+        color: '#00512C',
         fontWeight: 'bold',
     },
 });

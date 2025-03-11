@@ -118,6 +118,13 @@ export default function Login() {
                     Sign up
                 </Link>
             </View>
+            <View style={styles.imageContainer}>
+                <Image 
+                    source={require('../assets/images/loginbg.png')} // Replace with your actual image
+                    style={styles.backgroundImage}
+                    contentFit="cover"
+                />
+            </View>
         </KeyboardAvoidingView>
     );
 }
@@ -129,6 +136,7 @@ const styles = StyleSheet.create({
         paddingTop: '30%',
         backgroundColor: Colors.dark.backgroundColor,
     },
+   
     arrowButton: {
         position: 'absolute',
         top: 40,
@@ -145,7 +153,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     welcomeContainer: {
-        marginBottom: 24,
+        marginBottom: 30,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -160,18 +168,21 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
+        marginLeft: 8,
         color: Colors.dark.secondaryTextColor,
         marginBottom: 8,
     },
     input: {
         height: 40,
+        width: '95%',
         borderColor: Colors.dark.secondaryTextColor,
         borderWidth: 1.5,
-        marginBottom: 12,
+        marginBottom: 20,
         paddingHorizontal: 8,
         borderRadius: 8,
         color: Colors.dark.secondaryTextColor,
         backgroundColor: 'transparent',
+        alignSelf: 'center',
     },
     buttonContainer: {
         width: '50%',
@@ -183,14 +194,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         padding: 12,
         alignItems: 'center',
-        borderRadius: 16,
+        borderRadius: 20,
         borderWidth: 1,
         borderColor: Colors.dark.secondaryTextColor,
         marginTop: 12,
+        marginBottom: 12,
     },
     buttonText: {
         color: Colors.dark.secondaryTextColor,
         fontWeight: 'bold',
+        fontSize: 18,
     },
     linkContainer: {
         flexDirection: 'row',
@@ -207,5 +220,13 @@ const styles = StyleSheet.create({
         marginLeft: 4,
         fontWeight: 'bold',
         textDecorationLine: 'underline',
+    },
+    imageContainer: {
+        marginTop: '20%', // Adds spacing from the form
+        alignItems: 'center',
+    },
+    backgroundImage: {
+        width: '160%',
+        height: 420,
     },
 });
