@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, Pressable } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
 import { useAuthStore } from '@/lib/AuthStore';
 import { router } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
@@ -19,7 +19,7 @@ export default function TabOneScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Discover Recycle Ways</Text>
         <Image
@@ -32,7 +32,11 @@ export default function TabOneScreen() {
       {loading && <Text>Loading...</Text>}
       {!loading &&
         posts?.map((post, i) => (
-          <Pressable key={i} onPress={() => router.push(`/(tabs)/${post.id}`)} style={styles.postContainer}>
+          <Pressable
+            key={i}
+            onPress={() => router.push(`/(tabs)/${post.id}`)}
+            style={styles.postContainer}
+          >
             <Image
               source={{ uri: post.image_url }}
               style={styles.postImage}
@@ -42,9 +46,7 @@ export default function TabOneScreen() {
             <Text style={styles.body}>{post.description}</Text>
           </Pressable>
         ))}
-
-      <Button title="Logout" onPress={handleLogout} />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -52,40 +54,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   header: {
-    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    position: 'absolute',
-    top: '5%',
+    marginBottom: 20,
     paddingHorizontal: 20,
-    gap: 8,
+    justifyContent: 'space-between',
   },
   logo: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
   },
   headerTitle: {
-    fontSize: 36,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
   },
   title: {
     color: '#000',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   postContainer: {
-    width: '100%',
     marginVertical: 10,
+    marginHorizontal: 20,
     padding: 16,
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f8f8',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -93,7 +89,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    height: 200,
+    height: 150,
     borderRadius: 8,
     marginBottom: 8,
   },
@@ -101,8 +97,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   body: {
-    color: '#000',
+    color: '#333',
     fontSize: 16,
-    marginBottom: 4,
   },
 });
