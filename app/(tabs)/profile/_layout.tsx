@@ -6,7 +6,6 @@ export default function Profile() {
     return (
         <>
             <Slot />
-            <Text>Profile</Text>
         </>
     );
 }
