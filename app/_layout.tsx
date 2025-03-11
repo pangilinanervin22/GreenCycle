@@ -47,7 +47,6 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
   const { initializeAuth } = useAuthStore();
 
   // Initialize auth state on mount
@@ -56,7 +55,7 @@ function RootLayoutNav() {
   }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -66,7 +65,7 @@ function RootLayoutNav() {
         <Stack.Screen
           name="(tabs)"
           options={{
-            animation: 'fade', headerShown: false,
+            animation: 'fade',
           }}
         />
         <Stack.Screen
