@@ -47,12 +47,14 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const { initializeAuth } = useAuthStore();
+  const { initializeAuth, isAdmin } = useAuthStore();
 
   // Initialize auth state on mount
   useEffect(() => {
     initializeAuth();
   }, []);
+
+  console.log('Is Admin:', isAdmin());
 
   return (
     <ThemeProvider value={DefaultTheme}>
@@ -64,6 +66,12 @@ function RootLayoutNav() {
       >
         <Stack.Screen
           name="(tabs)"
+          options={{
+            animation: 'fade',
+          }}
+        />
+        <Stack.Screen
+          name="(admin)"
           options={{
             animation: 'fade',
           }}

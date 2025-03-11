@@ -51,7 +51,6 @@ export default function TabLayout() {
 
   if (loading) return <DefaultLoading loading={loading} />;
   if (!user) return <Redirect href="/start" />;
-  if (user.role === 'admin') return <Redirect href="/(admin)" />;
 
   return (
     <Tabs
@@ -80,31 +79,22 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="industry" color={color} />,
           header: () => null,
         }}
       />
       <Tabs.Screen
         name="post"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="leaf" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="file-text" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
           headerLeft: () => <AnimatedBackButton />,
         }}
       />
       <Tabs.Screen
-        name="create"
+        name="manage"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
-          headerTitle: () => <DefaultTitleHeader />,
-          headerLeft: () => <AnimatedBackButton />,
-        }}
-      />
-      <Tabs.Screen
-        name="[id]"
-        options={{
-          title: 'Profile',
-          href: null,
           headerTitle: () => <DefaultTitleHeader />,
           headerLeft: () => <AnimatedBackButton />,
         }}
