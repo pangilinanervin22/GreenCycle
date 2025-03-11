@@ -1,15 +1,12 @@
-import { Alert, Button, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Link, Stack, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
-import { useEffect } from 'react';
-import { FontAwesome } from '@expo/vector-icons';
 
 export default function PostDetail() {
     const { id } = useLocalSearchParams();
-    const { findPost, posts } = usePostStore();
+    const { findPost } = usePostStore();
     const currentPost = findPost(id as string);
-    console.log(currentPost, id, posts);
 
     if (!currentPost) {
         return (
@@ -20,46 +17,69 @@ export default function PostDetail() {
     }
 
     return (
-        <View style={styles.container} >
-            <Text style={styles.title} onPress={() => alert('Button pressed!')}>
-                {currentPost.title}
-            </Text>
-            <Image
-                style={styles.image}
-                contentFit="cover"
-                source={{ uri: currentPost.image_url }}
-            />
+        <ScrollView contentContainerStyle={styles.container}>
+            <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} />
+            <Text style={styles.title}>{currentPost.title}</Text>
             <Text style={styles.description}>{currentPost.description}</Text>
-        </View>
+            <Text style={styles.subtitle}>Author: {currentPost.author_name}</Text>
+            <Text style={styles.subtitle}>Likes: {currentPost.likes.count || 0}</Text>
+            <Text style={styles.subtitle}>Ingredients:</Text>
+            {currentPost.ingredients?.map((ingredient, i) => (
+                <Text key={i} style={styles.ingredientItem}>
+                    {ingredient}
+                </Text>
+            ))}
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#fff',
+        paddingHorizontal: 16,
+        paddingVertical: 24,
+        backgroundColor: '#f5f5f5',
     },
     notFound: {
         fontWeight: 'bold',
         fontSize: 16,
+        color: '#333',
     },
     title: {
         fontWeight: 'bold',
-        fontSize: 22,
-        marginBottom: 8,
-        color: '#000',
+        fontSize: 24,
+        marginBottom: 16,
+        color: '#333',
+        alignSelf: 'center',
     },
     image: {
         width: '100%',
         height: 250,
-        borderRadius: 6,
-        marginBottom: 8,
+        borderRadius: 8,
+        marginBottom: 16,
+        backgroundColor: '#ddd',
     },
     description: {
         fontSize: 16,
-        color: '#000',
+        color: '#444',
+        marginBottom: 12,
+        lineHeight: 22,
+        textAlign: 'justify',
+    },
+    subtitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginTop: 12,
+        color: '#333',
+    },
+    ingredientItem: {
+        fontSize: 14,
+        color: '#555',
+        marginLeft: 16,
+        marginTop: 4,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        backgroundColor: '#fff',
+        padding: 8,
     },
 });
-
-'/post/2'
