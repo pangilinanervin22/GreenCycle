@@ -41,7 +41,7 @@ export default function Signup() {
         <View style={styles.container}>
             <View style={styles.topContainer}>
                 <Pressable onPress={() => router.push('/start')} style={styles.backButton}>
-                    <FontAwesome name="arrow-left" size={24} color={Colors.light.text} />
+                    <FontAwesome name="arrow-left" size={24} color={'#00512C'} />
                 </Pressable>
                 <Image
                     source={require('../assets/images/logo.svg')}
@@ -63,7 +63,7 @@ export default function Signup() {
                     <TextInput
                         placeholder="Enter your name"
                         style={styles.input}
-                        placeholderTextColor={Colors.light.text}
+                        placeholderTextColor={'#00512C'}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value}
@@ -80,7 +80,7 @@ export default function Signup() {
                     <TextInput
                         placeholder="Enter email"
                         style={styles.input}
-                        placeholderTextColor={Colors.light.text}
+                        placeholderTextColor={'#00512C'}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value}
@@ -98,7 +98,7 @@ export default function Signup() {
                         secureTextEntry
                         placeholder="Enter password"
                         style={styles.input}
-                        placeholderTextColor={Colors.light.text}
+                        placeholderTextColor={'#00512C'}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value}
@@ -116,7 +116,7 @@ export default function Signup() {
                         secureTextEntry
                         placeholder="Confirm password"
                         style={styles.input}
-                        placeholderTextColor={Colors.light.text}
+                        placeholderTextColor={'#00512C'}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value}
@@ -142,7 +142,15 @@ export default function Signup() {
                     Login
                 </Link>
             </View>
+            <View style={styles.imageContainer}>
+                            <Image 
+                                source={require('../assets/images/signupbg.png')} // Replace with your actual image
+                                style={styles.backgroundImage}
+                                contentFit="cover"
+                            />
+                        </View>
         </View>
+        
     );
 }
 
@@ -170,7 +178,7 @@ const styles = StyleSheet.create({
     },
     backButtonText: {
         fontSize: 18,
-        color: Colors.light.text,
+        color: '#00512C',
         fontWeight: 'bold',
     },
     logo: {
@@ -188,26 +196,27 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 36,
         fontWeight: 'bold',
-        color: Colors.light.text,
+        color: '#00512C',
     },
     subText: {
         fontSize: 16,
-        color: Colors.light.text,
+        color: '#00512C',
         fontWeight: '400',
     },
     label: {
         fontSize: 16,
-        color: Colors.light.text,
+        color: '#00512C',
         marginBottom: 8,
+        marginLeft: 4,
     },
     input: {
         height: 40,
-        borderColor: Colors.light.text,
+        borderColor: '#00512C',
         borderWidth: 2,
-        marginBottom: 12,
+        marginBottom: 14,
         paddingHorizontal: 8,
         borderRadius: 8,
-        color: Colors.light.text,
+        color: '#00512C',
         backgroundColor: 'transparent',
     },
     buttonContainer: {
@@ -220,13 +229,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         padding: 12,
         alignItems: 'center',
-        borderRadius: 16,
-        borderWidth: 1.5,
-        borderColor: Colors.light.text,
-        marginTop: 12,
+        borderRadius: 20,
+        borderWidth: 2,
+        borderColor: '#00512C',
+        marginTop: 8,
     },
     buttonText: {
-        color: Colors.light.text,
+        color: '#00512C',
+        fontSize: 15,
         fontWeight: 'bold',
     },
     linkContainer: {
@@ -236,13 +246,21 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
     linkText: {
-        color: Colors.light.text,
+        color: '#00512C',
     },
     link: {
         fontSize: 16,
-        color: Colors.light.text,
+        color: '#00512C',
         marginLeft: 4,
         fontWeight: 'bold',
         textDecorationLine: 'underline',
+    },
+    imageContainer: {
+        marginTop: '5%', // Adds spacing from the form
+        alignItems: 'center',
+    },
+    backgroundImage: {
+        width: '120%',
+        height: 320,
     },
 });
