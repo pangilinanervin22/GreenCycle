@@ -1,15 +1,87 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Image } from 'expo-image';
-import { useLocalSearchParams, } from 'expo-router';
+import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useLocalSearchParams } from 'expo-router';
+import { useAuthStore } from '@/lib/AuthStore';
+
+
+interface ProfileFormData {
+    name: string;
+    description?: string;
+    email?: string;
+}
+
+const schema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    description: z.string().optional(),
+    email: z.string().email().optional(),
+});
 
 export default function ProfileDetails() {
-    const { id } = useLocalSearchParams();
+    const { user } = useAuthStore();
+
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            name: '',
+            description: '',
+            email: user?.email || '',
+        },
+    });
+
+    const onSubmit = (data: ProfileFormData) => {
+        console.log(data);
+    };
 
     return (
-        <View style={styles.container} >
-            <Text style={styles.title} onPress={() => alert('Button pressed!')}>
-                {id}
-            </Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>Edit Your Profile</Text>
+
+            <Controller
+                name="name"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Name"
+                        onChangeText={onChange}
+                        value={value}
+                    />
+                )}
+            />
+            {errors.name && <Text>{errors.name.message}</Text>}
+
+            <Controller
+                name="description"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Description"
+                        onChangeText={onChange}
+                        value={value}
+                    />
+                )}
+            />
+
+            <Controller
+                name="email"
+                control={control}
+                render={({ field: { value } }) => (
+                    <TextInput
+                        style={[styles.input, { backgroundColor: '#f0f0f0' }]}
+                        editable={false}
+                        value={value}
+                    />
+                )}
+            />
+
+            <Button title="Submit" onPress={handleSubmit(onSubmit)} />
         </View>
     );
 }
@@ -20,26 +92,17 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#fff',
     },
-    notFound: {
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
     title: {
         fontWeight: 'bold',
         fontSize: 22,
         marginBottom: 8,
         color: '#000',
     },
-    image: {
-        width: '100%',
-        height: 250,
-        borderRadius: 6,
-        marginBottom: 8,
-    },
-    description: {
-        fontSize: 16,
-        color: '#000',
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        marginBottom: 12,
+        padding: 8,
+        borderRadius: 4,
     },
 });
-
-'/post/2'
