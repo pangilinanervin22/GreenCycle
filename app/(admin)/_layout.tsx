@@ -69,9 +69,6 @@ export default function TabLayout() {
         headerStyle: {
           backgroundColor: '#ECE9E5',
           elevation: 0,
-          height: 70,
-          width: '100%',
-          flexDirection: 'row',
         },
       }}
     >

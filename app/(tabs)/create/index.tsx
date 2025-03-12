@@ -115,97 +115,96 @@ export default function RecipeForm() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.container}>
-        <Text style={styles.title}>Add Recycle Ways</Text>
-        <Text style={styles.desc}>You can add your own recycle ways on any fruit or vegetable you want 
-        and share your ideas to everyone </Text>
-        <Text style={styles.label}>Name of Product</Text>
-        <Controller
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput style={styles.input} placeholder="Enter Name of Product" onBlur={onBlur} onChangeText={onChange} value={value} />
-            )}
-            name="title"
-        />
-        {errors.title && <Text style={styles.error}>{errors.title.message}</Text>}
-
-        <Text style={styles.label}>Description</Text>
-        <Controller
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                    style={styles.inputdesc}
-                    placeholder="Enter description"
-                    multiline
-                    numberOfLines={4}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
+            <View style={styles.container}>
+                <Text style={styles.title}>Add Recycle Ways</Text>
+                <Text style={styles.desc}>You can add your own recycle ways on any fruit or vegetable you want
+                    and share your ideas to everyone </Text>
+                <Text style={styles.label}>Name of Product</Text>
+                <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput style={styles.input} placeholder="Enter Name of Product" onBlur={onBlur} onChangeText={onChange} value={value} />
+                    )}
+                    name="title"
                 />
-            )}
-            name="description"
-        />
-        {errors.description && <Text style={styles.error}>{errors.description.message}</Text>}
+                {errors.title && <Text style={styles.error}>{errors.title.message}</Text>}
 
-        <Text style={styles.label}>Ingredients</Text>
-        <Text style={styles.labeldesc}>Add all the ingredient of your product including their measurements</Text>
-        <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
-                <Text style={styles.addButtonText}>+ Add Ingredients</Text>
-            </TouchableOpacity>
-        <View style={styles.ingredientContainer}>
-            <TextInput
-                style={[styles.input, styles.ingredientInput]}
-                placeholder="Add ingredient"
-                value={currentIngredient}
-                onChangeText={setCurrentIngredient}
-                onSubmitEditing={addIngredient}
-            />
-            
-        </View>
+                <Text style={styles.label}>Description</Text>
+                <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                            style={styles.inputdesc}
+                            placeholder="Enter description"
+                            multiline
+                            numberOfLines={4}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                        />
+                    )}
+                    name="description"
+                />
+                {errors.description && <Text style={styles.error}>{errors.description.message}</Text>}
 
-        <View style={styles.ingredientsList}>
-            {ingredients.map((ingredient, index) => (
-                <View key={index} style={styles.ingredientItem}>
-                    <Text>{ingredient}</Text>
-                    <TouchableOpacity onPress={() => removeIngredient(index)}>
-                        <Text style={styles.removeText}>×</Text>
-                    </TouchableOpacity>
-                </View>
-            ))}
-        </View>
-
-        <View style={styles.imageContainer}>
-                <Text style={styles.imageLabel}>Image</Text>
-                <Text style={styles.imagedesc}>add image to present your product</Text>
-                <TouchableOpacity style={styles.imageButton} onPress={pickImage} disabled={uploading}>
-                    <Text style={styles.imageButtonText}>{uploading ? 'Uploading...' : 'Pick Image'}</Text>
+                <Text style={styles.label}>Ingredients</Text>
+                <Text style={styles.labeldesc}>Add all the ingredient of your product including their measurements</Text>
+                <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
+                    <Text style={styles.addButtonText}>+ Add Ingredients</Text>
                 </TouchableOpacity>
-                {selectedImage && (
-                    <View style={styles.imagePreviewContainer}>
-                        <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
-                        <TouchableOpacity onPress={() => setSelectedImage(null)} style={styles.removeImageButton}>
-                            <Text style={styles.removeText}>Remove</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </View>
+                <View style={styles.ingredientContainer}>
+                    <TextInput
+                        style={[styles.input, styles.ingredientInput]}
+                        placeholder="Add ingredient"
+                        value={currentIngredient}
+                        onChangeText={setCurrentIngredient}
+                        onSubmitEditing={addIngredient}
+                    />
 
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit(onSubmit)}>
-                <Text style={styles.submitButtonText}>Submit Recipe</Text>
-            </TouchableOpacity>
-        </View>
+                </View>
+
+                <View style={styles.ingredientsList}>
+                    {ingredients.map((ingredient, index) => (
+                        <View key={index} style={styles.ingredientItem}>
+                            <Text>{ingredient}</Text>
+                            <TouchableOpacity onPress={() => removeIngredient(index)}>
+                                <Text style={styles.removeText}>×</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </View>
+
+                <View style={styles.imageContainer}>
+                    <Text style={styles.imageLabel}>Image</Text>
+                    <Text style={styles.imagedesc}>add image to present your product</Text>
+                    <TouchableOpacity style={styles.imageButton} onPress={pickImage} disabled={uploading}>
+                        <Text style={styles.imageButtonText}>{uploading ? 'Uploading...' : 'Pick Image'}</Text>
+                    </TouchableOpacity>
+                    {selectedImage && (
+                        <View style={styles.imagePreviewContainer}>
+                            <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
+                            <TouchableOpacity onPress={() => setSelectedImage(null)} style={styles.removeImageButton}>
+                                <Text style={styles.removeText}>Remove</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
+
+                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit(onSubmit)}>
+                    <Text style={styles.submitButtonText}>Submit Recipe</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     contentContainer: {
-        paddingBottom: 50, 
+        paddingBottom: 50,
     },
     container: {
         flex: 1,
         padding: 12,
-        paddingTop: 20,
         backgroundColor: '#F8F8F8',
     },
     title: {
@@ -257,7 +256,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 2,
-        
+
     },
     ingredientInput: {
         flex: 1,
@@ -285,20 +284,20 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.8)',
     },
-   
+
     imageContainer: {
         backgroundColor: 'transparent',
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.46)',
-        alignItems: 'flex-start', 
+        alignItems: 'flex-start',
     },
     imageLabel: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#444',
-        textAlign: 'left', 
+        textAlign: 'left',
     },
     imagedesc: {
         fontSize: 12,
@@ -311,14 +310,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         borderWidth: 1,
         borderColor: '#00512C',
-        paddingVertical: 10, 
-        paddingHorizontal: 18, 
+        paddingVertical: 10,
+        paddingHorizontal: 18,
         borderRadius: 6,
     },
     imageButtonText: {
         color: '#00512C',
         fontWeight: 'bold',
-        fontSize: 14, 
+        fontSize: 14,
     },
     imagePreviewContainer: {
         marginTop: 10,
@@ -349,17 +348,17 @@ const styles = StyleSheet.create({
     submitButton: {
         backgroundColor: '#00512C',
         paddingVertical: 15,
-        paddingHorizontal: 20, 
-        borderRadius: 25, 
+        paddingHorizontal: 20,
+        borderRadius: 25,
         alignItems: 'center',
-        alignSelf: 'center', 
+        alignSelf: 'center',
         marginTop: 10,
         marginBottom: 20,
     },
     submitButtonText: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: 14, 
+        fontSize: 14,
     },
-    
+
 });
