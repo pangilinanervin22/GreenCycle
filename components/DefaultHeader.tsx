@@ -21,11 +21,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 5,
-        paddingBottom: 10,
+        paddingBlock: 10,
     },
     logo: {
-        width: 40,
-        height: 40,
+        width: 50,
+        height: 50,
     },
     title: {
         fontSize: 24,
