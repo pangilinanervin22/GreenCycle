@@ -21,12 +21,13 @@ interface AuthState {
     logout: () => Promise<void>;
     initializeAuth: () => Promise<void>;
     isAdmin: () => boolean;
+    updateAccount: (name: string, description?: string) => Promise<void>; // New method
 }
 
 const fetchUserProfile = async (userId: string): Promise<User> => {
     const { data, error } = await supabase
         .from('users')
-        .select('email, name, description, role')
+        .select('*')
         .eq('id', userId)
         .single();
 
@@ -37,6 +38,7 @@ const fetchUserProfile = async (userId: string): Promise<User> => {
         name: data.name || '',
         description: data.description || '',
         role: data.role || 'user',
+        id: data.id || ''
     };
 };
 
@@ -61,7 +63,6 @@ export const useAuthStore = create<AuthState>()(
                     set({ loading: false });
                 }
             },
-
             signup: async (email, password, name) => {
                 set({ loading: true });
                 try {
@@ -86,7 +87,6 @@ export const useAuthStore = create<AuthState>()(
                     set({ loading: false });
                 }
             },
-
             logout: async () => {
                 set({ loading: true });
                 try {
@@ -110,6 +110,28 @@ export const useAuthStore = create<AuthState>()(
                     } else {
                         set({ user: null });
                     }
+                } finally {
+                    set({ loading: false });
+                }
+            },
+
+            // New method to update account
+            updateAccount: async (name, description) => {
+                set({ loading: true });
+                try {
+                    const user = get().user;
+                    if (!user || !user.id) throw new Error('User not logged in');
+
+                    const { data, error } = await supabase
+                        .from('users')
+                        .update({ name, description })
+                        .eq('id', user.id)
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+
+                    set({ user: { ...user, name: data.name, description: data.description } });
                 } finally {
                     set({ loading: false });
                 }
