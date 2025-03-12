@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import * as SecureStore from 'expo-secure-store';
 import { supabase } from "./supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface User {
     id?: string;
@@ -90,6 +91,9 @@ export const useAuthStore = create<AuthState>()(
                 set({ loading: true });
                 try {
                     await supabase.auth.signOut();
+                    AsyncStorage.clear();
+                    SecureStore.deleteItemAsync('auth-storage');
+
                     set({ user: null });
                 } finally {
                     set({ loading: false });
