@@ -35,6 +35,7 @@ interface PostState {
     deletePost: (postId: string) => Promise<void>;
     findPost: (postId: string) => Post | undefined;
     updatePost: (postId: string, content: PostAddOrEdit) => Promise<void>;
+    toggleLike: (postId: string) => Promise<void>;
 }
 
 export const usePostStore = create<PostState>()(
@@ -48,13 +49,19 @@ export const usePostStore = create<PostState>()(
                     const { data, error } = await supabase
                         .from('recycle_post')
                         .select(`
-                            *,
-                            likes:likes(count)
-                        `)
+              *,
+              likes: likes(count),
+              users(name)
+            `)
                         .order('created_at', { ascending: false });
 
+                    // Process the nested data
+                    const processedData = data?.map(post => ({
+                        ...post,
+                        author_name: post.users?.name // Optional chaining in case users is null
+                    })) || [];
                     if (error) throw error;
-                    set({ posts: data || [] });
+                    set({ posts: processedData || [] });
                 } finally {
                     set({ loading: false });
                 }
@@ -90,19 +97,28 @@ export const usePostStore = create<PostState>()(
             deletePost: async (postId: string) => {
                 set({ loading: true });
                 try {
+                    // Delete the post from the main table
                     const { error } = await supabase
                         .from('recycle_post')
                         .delete()
                         .eq('id', postId);
 
                     if (error) throw error;
+
+                    // Also remove all likes for that post from the likes table
+                    const { error: likesError } = await supabase
+                        .from('likes')
+                        .delete()
+                        .eq('post_id', postId);
+                    if (likesError) throw likesError;
+
                     set({ posts: get().posts.filter((post) => post.id !== postId) });
                 } finally {
                     set({ loading: false });
                 }
             },
             findPost: (postId: string) => {
-                return get().posts.find(post => post.id == postId);
+                return get().posts.find(post => post.id === postId);
             },
             updatePost: async (postId: string, content: PostAddOrEdit) => {
                 set({ loading: true });
@@ -124,6 +140,56 @@ export const usePostStore = create<PostState>()(
                     set({ loading: false });
                 }
             },
+            toggleLike: async (postId: string) => {
+                const { user } = useAuthStore.getState();
+                if (!user) throw new Error('User not authenticated');
+
+                const post = get().posts.find(p => p.id === postId);
+                if (!post) return;
+
+                // Ensure likes.users exists and is properly initialized
+                const hasLiked = user.id ? post.likes?.users?.includes(user.id) ?? false : false;
+                const originalState = [...get().posts];
+
+                // Optimistic update with safe array access
+                set(state => ({
+                    posts: state.posts.map(p => {
+                        if (p.id === postId) {
+                            const currentUsers = p.likes?.users ?? []; // Fallback to empty array
+                            const newUsers = hasLiked
+                                ? currentUsers.filter(id => id !== user.id)
+                                : [...currentUsers, user.id].filter((id): id is string => id !== undefined);
+
+                            return {
+                                ...p,
+                                likes: {
+                                    count: newUsers.length,
+                                    users: newUsers
+                                }
+                            };
+                        }
+                        return p;
+                    })
+                }));
+
+                try {
+                    if (hasLiked) {
+                        const { error } = await supabase
+                            .from('likes')
+                            .delete()
+                            .match({ user_id: user.id, post_id: postId });
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabase
+                            .from('likes')
+                            .insert({ user_id: user.id, post_id: postId });
+                        if (error) throw error;
+                    }
+                } catch (error) {
+                    set({ posts: originalState });
+                    throw error;
+                }
+            }
         }),
         {
             name: 'post-storage',
@@ -147,7 +213,8 @@ export const usePostStore = create<PostState>()(
                 deletePost: state.deletePost,
                 findPost: state.findPost,
                 updatePost: state.updatePost,
-            }), // Only persist posts
+                toggleLike: state.toggleLike,
+            }), // Only persist posts and loading state
         }
     )
 );
