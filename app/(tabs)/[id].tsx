@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 
 export default function PostDetail() {
     const { id } = useLocalSearchParams();
-    const { findPost } = usePostStore();
+    const { findPost, toggleLike } = usePostStore();
     const currentPost = findPost(id as string);
 
     if (!currentPost) {
@@ -18,31 +18,42 @@ export default function PostDetail() {
         );
     }
 
+    const handleLike = async () => {
+        console.log('like', id);
+
+        try {
+            await toggleLike(id as string);
+        } catch (error) {
+            console.error('Failed to toggle like:', error);
+        }
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
                 <FontAwesome name="arrow-left" size={20} color="#00512C" />
             </TouchableOpacity>
             <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} />
-            
-            
-            <View style ={styles.allcontent}>
-            <Text style={styles.title}>{currentPost.title}</Text>
-            <View style={styles.authorContainer}>
+
+            <View style={styles.allcontent}>
+                <Text style={styles.title}>{currentPost.title}</Text>
+                <View style={styles.authorContainer}>
                     <FontAwesome name="user" size={16} color="#00512C" style={styles.icon} />
                     <Text style={styles.subtitle}>{currentPost.author_name}</Text>
                 </View>
                 <View style={styles.likesContainer}>
-                    <FontAwesome name="heart" size={16} color="#00512C" style={styles.icon} />
-                    <Text style={styles.subtitlelikes}>{currentPost.likes.count || 0}</Text>
+                    <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
+                        <FontAwesome name="heart" size={16} color="#00512C" style={styles.icon} />
+                        <Text style={styles.subtitlelikes}>{currentPost.likes.count || 0}</Text>
+                    </TouchableOpacity>
                 </View>
-            <Text style={styles.description}>{currentPost.description}</Text>
-            <Text style={styles.subtitleIngredients}>Ingredients:</Text>
-            {currentPost.ingredients?.map((ingredient, i) => (
-                <Text key={i} style={styles.ingredientItem}>
-                    {ingredient}
-                </Text>
-            ))}
+                <Text style={styles.description}>{currentPost.description}</Text>
+                <Text style={styles.subtitleIngredients}>Ingredients:</Text>
+                {currentPost.ingredients?.map((ingredient, i) => (
+                    <Text key={i} style={styles.ingredientItem}>
+                        {ingredient}
+                    </Text>
+                ))}
             </View>
         </ScrollView>
     );
@@ -107,6 +118,10 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         marginTop: 5,
         color: '#00512C',
+    },
+    likeButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     icon: {
         marginRight: 8,
