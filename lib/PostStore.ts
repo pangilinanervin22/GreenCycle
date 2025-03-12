@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, StorageValue } from 'zustand/middleware';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
 import { useAuthStore } from './AuthStore';
 
@@ -126,14 +126,18 @@ export const usePostStore = create<PostState>()(
             },
         }),
         {
-            name: 'post-storage', // Unique key for SecureStore
+            name: 'post-storage',
             storage: {
                 getItem: async (name: string) => {
-                    const item = await SecureStore.getItemAsync(name);
+                    const item = await AsyncStorage.getItem(name);
                     return item ? JSON.parse(item) : null;
                 },
-                setItem: (name: string, value: StorageValue<PostState>) => SecureStore.setItemAsync(name, JSON.stringify(value)),
-                removeItem: SecureStore.deleteItemAsync,
+                setItem: async (name: string, value: StorageValue<PostState>) => {
+                    await AsyncStorage.setItem(name, JSON.stringify(value));
+                },
+                removeItem: async (name: string) => {
+                    await AsyncStorage.removeItem(name);
+                },
             },
             partialize: (state) => ({
                 posts: state.posts,
