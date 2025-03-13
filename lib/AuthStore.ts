@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import * as SecureStore from 'expo-secure-store';
 import { supabase } from "./supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
 interface User {
     id?: string;
@@ -21,7 +22,7 @@ interface AuthState {
     logout: () => Promise<void>;
     initializeAuth: () => Promise<void>;
     isAdmin: () => boolean;
-    updateAccount: (name: string, description?: string) => Promise<void>; // New method
+    updateAccount: (name: string, description?: string) => Promise<void>;
 }
 
 const fetchUserProfile = async (userId: string): Promise<User> => {
@@ -41,6 +42,8 @@ const fetchUserProfile = async (userId: string): Promise<User> => {
         id: data.id || ''
     };
 };
+
+const isWeb = Platform.OS === 'web';
 
 export const useAuthStore = create<AuthState>()(
     persist(
@@ -91,9 +94,11 @@ export const useAuthStore = create<AuthState>()(
                 set({ loading: true });
                 try {
                     await supabase.auth.signOut();
-                    AsyncStorage.clear();
-                    SecureStore.deleteItemAsync('auth-storage');
-
+                    if (isWeb) {
+                        localStorage.removeItem('auth-storage');
+                    } else {
+                        await SecureStore.deleteItemAsync('auth-storage');
+                    }
                     set({ user: null });
                 } finally {
                     set({ loading: false });
@@ -115,7 +120,6 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
-            // New method to update account
             updateAccount: async (name, description) => {
                 set({ loading: true });
                 try {
@@ -141,14 +145,37 @@ export const useAuthStore = create<AuthState>()(
             name: 'auth-storage',
             storage: {
                 getItem: async (name) => {
-                    const value = await SecureStore.getItemAsync(name);
-                    return value ? JSON.parse(value) : null;
+                    if (isWeb) {
+                        // Check if localStorage is available
+                        if (typeof window !== 'undefined' && window.localStorage) {
+                            const value = localStorage.getItem(name);
+                            return value ? JSON.parse(value) : null;
+                        }
+                        return null;
+                    } else {
+                        const value = await SecureStore.getItemAsync(name);
+                        return value ? JSON.parse(value) : null;
+                    }
                 },
                 setItem: async (name, value) => {
-                    await SecureStore.setItemAsync(name, JSON.stringify(value));
+                    if (isWeb) {
+                        // Check if localStorage is available
+                        if (typeof window !== 'undefined' && window.localStorage) {
+                            localStorage.setItem(name, JSON.stringify(value));
+                        }
+                    } else {
+                        await SecureStore.setItemAsync(name, JSON.stringify(value));
+                    }
                 },
                 removeItem: async (name) => {
-                    await SecureStore.deleteItemAsync(name);
+                    if (isWeb) {
+                        // Check if localStorage is available
+                        if (typeof window !== 'undefined' && window.localStorage) {
+                            localStorage.removeItem(name);
+                        }
+                    } else {
+                        await SecureStore.deleteItemAsync(name);
+                    }
                 },
             },
         }
