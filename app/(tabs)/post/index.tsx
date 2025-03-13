@@ -1,12 +1,10 @@
 import { ScrollView, StyleSheet, Text, View, Pressable, ActivityIndicator } from 'react-native';
-import { useAuthStore } from '@/lib/AuthStore';
 import { router } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
 import { useEffect } from 'react';
 import { Image } from 'expo-image';
 
 export default function PostLayout() {
-  const { logout } = useAuthStore();
   const { fetchPosts, posts, loading } = usePostStore();
 
   useEffect(() => {
