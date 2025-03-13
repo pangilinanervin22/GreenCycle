@@ -2,9 +2,8 @@ import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLocalSearchParams } from 'expo-router';
 import { useAuthStore } from '@/lib/AuthStore';
-
+import { useRouter } from 'expo-router';
 
 interface ProfileFormData {
     name: string;
@@ -19,7 +18,8 @@ const schema = z.object({
 });
 
 export default function ProfileDetails() {
-    const { user } = useAuthStore();
+    const { user, updateAccount } = useAuthStore();
+    const router = useRouter();
 
     const {
         control,
@@ -28,14 +28,16 @@ export default function ProfileDetails() {
     } = useForm({
         resolver: zodResolver(schema),
         defaultValues: {
-            name: '',
-            description: '',
+            name: user?.name || '',
+            description: user?.description || '',
             email: user?.email || '',
         },
     });
 
-    const onSubmit = (data: ProfileFormData) => {
-        console.log(data);
+    const onSubmit = async (data: ProfileFormData) => {
+        await updateAccount(data.name, data.description);
+
+        router.push('/profile');
     };
 
     return (
