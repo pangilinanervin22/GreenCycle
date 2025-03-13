@@ -103,8 +103,9 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           href: null,
-          headerTitle: () => <DefaultTitleHeader />,
-          headerLeft: () => <AnimatedBackButton />,
+          header: () => null,
+          // headerTitle: () => <DefaultTitleHeader />,
+          // headerLeft: () => <AnimatedBackButton />,
         }}
       />
       <Tabs.Screen
