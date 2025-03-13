@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
 import { usePostStore } from '@/lib/PostStore';
 import { ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const recipeSchema = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -18,6 +19,7 @@ const recipeSchema = z.object({
 type RecipeFormData = z.infer<typeof recipeSchema>;
 
 export default function RecipeForm() {
+    const router = useRouter();
     const [currentIngredient, setCurrentIngredient] = useState('');
     const [uploading, setUploading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -26,7 +28,6 @@ export default function RecipeForm() {
         control,
         handleSubmit,
         setValue,
-        getValues,
         reset,
         watch,
         formState: { errors },
@@ -108,6 +109,7 @@ export default function RecipeForm() {
 
             await createPost(post);
             Alert.alert('Recipe created successfully!');
+            router.push('/(tabs)');
         } catch (error) {
             Alert.alert('Error creating recipe');
         }
