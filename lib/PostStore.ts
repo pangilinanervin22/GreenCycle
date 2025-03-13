@@ -3,6 +3,7 @@ import { persist, StorageValue } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
 import { useAuthStore } from './AuthStore';
+import { Platform } from 'react-native';
 
 export interface Post {
     id: string;
@@ -38,6 +39,8 @@ interface PostState {
     toggleLike: (postId: string) => Promise<void>;
 }
 
+const isWeb = Platform.OS === 'web';
+
 export const usePostStore = create<PostState>()(
     persist(
         (set, get) => ({
@@ -49,16 +52,19 @@ export const usePostStore = create<PostState>()(
                     const { data, error } = await supabase
                         .from('recycle_post')
                         .select(`
-              *,
-              likes: likes(count),
-              users(name)
-            `)
-                        .order('created_at', { ascending: false });
+                      *,
+                       likes(user_id),
+                     users(name)
+                    `).order('created_at', { ascending: false });
 
                     // Process the nested data
                     const processedData = data?.map(post => ({
                         ...post,
-                        author_name: post.users?.name // Optional chaining in case users is null
+                        author_name: post.users?.name || 'Unknown Author', // Optional chaining in case users is null
+                        likes: {
+                            count: post.likes?.length || 0,
+                            users: post.likes?.map((like: { user_id: any; }) => like.user_id) || []
+                        }
                     })) || [];
                     if (error) throw error;
                     set({ posts: processedData || [] });
@@ -73,23 +79,32 @@ export const usePostStore = create<PostState>()(
                 set({ loading: true });
                 try {
                     const createdPost = {
-                        user_id: user.id,
-                        author_name: user.name,
+                        author_id: user.id,
                         ingredients: [...content.ingredients],
                         description: content.description,
                         title: content.title,
                         image_url: content.image_url,
-                        likes: 0,
                         status: "REQUESTING"
                     };
+
 
                     const { data, error } = await supabase
                         .from('recycle_post')
                         .insert(createdPost)
                         .select();
 
+
                     if (error) throw error;
-                    set({ posts: [data[0], ...get().posts] });
+                    set({
+                        posts: [{
+                            ...data[0],
+                            author_name: user.name,
+                            likes: {
+                                count: 0,
+                                users: []
+                            }
+                        }, ...get().posts]
+                    });
                 } finally {
                     set({ loading: false });
                 }
@@ -195,14 +210,37 @@ export const usePostStore = create<PostState>()(
             name: 'post-storage',
             storage: {
                 getItem: async (name: string) => {
-                    const item = await AsyncStorage.getItem(name);
-                    return item ? JSON.parse(item) : null;
+                    if (isWeb) {
+                        // Check if localStorage is available
+                        if (typeof window !== 'undefined' && window.localStorage) {
+                            const value = localStorage.getItem(name);
+                            return value ? JSON.parse(value) : null;
+                        }
+                        return null;
+                    } else {
+                        const value = await AsyncStorage.getItem(name);
+                        return value ? JSON.parse(value) : null;
+                    }
                 },
                 setItem: async (name: string, value: StorageValue<PostState>) => {
-                    await AsyncStorage.setItem(name, JSON.stringify(value));
+                    if (isWeb) {
+                        // Check if localStorage is available
+                        if (typeof window !== 'undefined' && window.localStorage) {
+                            localStorage.setItem(name, JSON.stringify(value));
+                        }
+                    } else {
+                        await AsyncStorage.setItem(name, JSON.stringify(value));
+                    }
                 },
                 removeItem: async (name: string) => {
-                    await AsyncStorage.removeItem(name);
+                    if (isWeb) {
+                        // Check if localStorage is available
+                        if (typeof window !== 'undefined' && window.localStorage) {
+                            localStorage.removeItem(name);
+                        }
+                    } else {
+                        await AsyncStorage.removeItem(name);
+                    }
                 },
             },
             partialize: (state) => ({
