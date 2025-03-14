@@ -19,8 +19,6 @@ export default function PostDetail() {
     }
 
     const handleLike = async () => {
-        console.log('like', id);
-
         try {
             await toggleLike(id as string);
         } catch (error) {
@@ -30,11 +28,10 @@ export default function PostDetail() {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                 <FontAwesome name="arrow-left" size={20} color="#00512C" />
             </TouchableOpacity>
             <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} />
-
             <View style={styles.allcontent}>
                 <Text style={styles.title}>{currentPost.title}</Text>
                 <View style={styles.authorContainer}>
