@@ -4,25 +4,38 @@ import { usePostStore } from '@/lib/PostStore';
 import { useCallback, useEffect, useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 
-// Status styling helper
-const getStatusStyle = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'published':
-      return { backgroundColor: '#e6f4ea', color: '#137333' };
-    case 'draft':
-      return { backgroundColor: '#fff8e1', color: '#f9ab00' };
-    case 'pending':
-      return { backgroundColor: '#e8f0fe', color: '#1967d2' };
-    default:
-      return { backgroundColor: '#f8f9fa', color: '#6c757d' };
+// Status configuration
+const statusConfig = {
+  ACCEPTED: {
+    label: 'ACCEPTED',
+    backgroundColor: '#e8f5e9',
+    textColor: '#2e7d32'
+  },
+  REQUESTING: {
+    label: 'REQUESTING',
+    backgroundColor: '#fff3e0',
+    textColor: '#ef6c00'
+  },
+  REJECTED: {
+    label: 'REJECTED',
+    backgroundColor: '#ffebee',
+    textColor: '#c62828'
   }
+};
+
+const getStatusStyle = (status: string) => {
+  const upperStatus = status.toUpperCase();
+  return statusConfig[upperStatus as keyof typeof statusConfig] || {
+    label: status,
+    backgroundColor: '#f8f9fa',
+    textColor: '#6c757d'
+  };
 };
 
 export default function ManageLayout() {
   const { fetchPosts, posts, loading } = usePostStore();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter posts based on search query
   const filteredPosts = posts?.filter(post =>
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.author_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,18 +52,18 @@ export default function ManageLayout() {
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       {(loading && posts.length === 0) ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color="#2e7d32" />
           <Text style={styles.loadingText}>Fetching posts...</Text>
         </View>
       ) : (
         <ScrollView style={styles.container}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Manage Posts</Text>
-            {/* Search Bar */}
             <View style={styles.searchContainer}>
               <TextInput
                 style={styles.searchInput}
-                placeholder="Search posts name..."
+                placeholder="Search posts..."
+                placeholderTextColor="#666"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
@@ -77,8 +90,8 @@ export default function ManageLayout() {
                 <Text style={styles.cell} numberOfLines={1}>{post.author_name}</Text>
                 <View style={styles.cell}>
                   <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}>
-                    <Text style={[styles.statusText, { color: statusStyle.color }]}>
-                      {post.status}
+                    <Text style={[styles.statusText, { color: statusStyle.textColor }]}>
+                      {statusStyle.label}
                     </Text>
                   </View>
                 </View>
@@ -90,8 +103,7 @@ export default function ManageLayout() {
                 </Pressable>
               </View>
             )
-          }
-          )}
+          })}
         </ScrollView>
       )}
     </View>
@@ -110,7 +122,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#1b5e20',
     textAlign: 'center',
   },
   searchContainer: {
@@ -121,13 +133,14 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#81c784',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    color: '#2e7d32',
   },
   searchButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#388e3c',
     borderRadius: 8,
     padding: 14,
     alignItems: 'center',
@@ -135,7 +148,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#e8f5e9',
     paddingVertical: 12,
     borderRadius: 8,
     marginBottom: 8,
@@ -152,7 +165,7 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     fontWeight: '600',
-    color: '#000',
+    color: '#1b5e20',
     textAlign: 'center',
     fontSize: 14,
   },
@@ -172,10 +185,9 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 13,
     fontWeight: '500',
-    textTransform: 'capitalize',
   },
   actionButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#43a047',
     paddingVertical: 6,
     borderRadius: 6,
     flex: 1,
@@ -195,6 +207,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 18,
-    color: '#333',
+    color: '#2e7d32',
   },
 });
