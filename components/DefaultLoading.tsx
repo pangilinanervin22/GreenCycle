@@ -30,18 +30,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'white',
+        gap: 20,
     },
     image: {
         width: 100,
         height: 100,
-        marginBottom: 20,
+        marginVertical: 20,
     },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
     },
     loadingText: {
-        marginTop: 10,
+        marginVertical: 10,
         color: 'gray',
     },
 });
