@@ -19,6 +19,7 @@ export interface Post {
     ingredients: string[];
     created_at: string;
     status: "REQUESTING" | "ACCEPTED" | "REJECTED";
+    synced: boolean;
 }
 
 export interface PostAddOrEdit {
@@ -48,6 +49,7 @@ export const usePostStore = create<PostState>()(
             loading: false,
             fetchPosts: async () => {
                 set({ loading: true });
+                const originalState = structuredClone(get().posts);
                 try {
                     const { data, error } = await supabase
                         .from('recycle_post')
@@ -57,17 +59,26 @@ export const usePostStore = create<PostState>()(
                      users(name)
                     `).order('created_at', { ascending: false });
 
+                    console.log(data, error);
+
+                    if (error) throw error;
+
+
                     // Process the nested data
-                    const processedData = data?.map(post => ({
+                    const processedData: Post[] = data?.map(post => ({
                         ...post,
+                        synced: true,
                         author_name: post.users?.name || 'Unknown Author', // Optional chaining in case users is null
                         likes: {
                             count: post.likes?.length || 0,
-                            users: post.likes?.map((like: { user_id: any; }) => like.user_id) || []
+                            users: post.likes?.map((like: any) => like.user_id) || []
                         }
                     })) || [];
                     if (error) throw error;
                     set({ posts: processedData || [] });
+                } catch (error) {
+                    set({ posts: originalState });
+                    throw error;
                 } finally {
                     set({ loading: false });
                 }
@@ -87,12 +98,10 @@ export const usePostStore = create<PostState>()(
                         status: "REQUESTING"
                     };
 
-
                     const { data, error } = await supabase
                         .from('recycle_post')
                         .insert(createdPost)
                         .select();
-
 
                     if (error) throw error;
                     set({
@@ -159,32 +168,26 @@ export const usePostStore = create<PostState>()(
                 const { user } = useAuthStore.getState();
                 if (!user) throw new Error('User not authenticated');
 
-                const post = get().posts.find(p => p.id === postId);
-                if (!post) return;
+                const currentPost = get().posts.find((p) => p.id === postId);
+                if (!currentPost) return;
 
-                // Ensure likes.users exists and is properly initialized
-                const hasLiked = user.id ? post.likes?.users?.includes(user.id) ?? false : false;
-                const originalState = [...get().posts];
+                const userId = user.id!;
+                const hasLiked = currentPost.likes?.users?.includes(userId) ?? false;
+                const originalPosts = get().posts;
+                const newCount = currentPost.likes.count + (hasLiked ? -1 : 1);
+                const newUsers = hasLiked ? currentPost.likes.users.filter((id) => id !== userId) : [...currentPost.likes.users, userId];
 
-                // Optimistic update with safe array access
-                set(state => ({
-                    posts: state.posts.map(p => {
-                        if (p.id === postId) {
-                            const currentUsers = p.likes?.users ?? []; // Fallback to empty array
-                            const newUsers = hasLiked
-                                ? currentUsers.filter(id => id !== user.id)
-                                : [...currentUsers, user.id].filter((id): id is string => id !== undefined);
-
-                            return {
-                                ...p,
-                                likes: {
-                                    count: newUsers.length,
-                                    users: newUsers
-                                }
-                            };
-                        }
-                        return p;
-                    })
+                // Optimistic update
+                set((state) => ({
+                    posts: state.posts.map((postItem) =>
+                        postItem.id === postId ? {
+                            ...postItem,
+                            likes: {
+                                count: newCount,
+                                users: newUsers,
+                            },
+                        } : postItem
+                    ),
                 }));
 
                 try {
@@ -192,16 +195,16 @@ export const usePostStore = create<PostState>()(
                         const { error } = await supabase
                             .from('likes')
                             .delete()
-                            .match({ user_id: user.id, post_id: postId });
+                            .match({ user_id: userId, post_id: postId });
                         if (error) throw error;
                     } else {
                         const { error } = await supabase
                             .from('likes')
-                            .insert({ user_id: user.id, post_id: postId });
+                            .insert({ user_id: userId, post_id: postId });
                         if (error) throw error;
                     }
                 } catch (error) {
-                    set({ posts: originalState });
+                    set({ posts: originalPosts });
                     throw error;
                 }
             }
