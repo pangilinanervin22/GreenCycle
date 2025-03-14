@@ -5,6 +5,7 @@ import { supabase } from './supabase';
 import { useAuthStore } from './AuthStore';
 import { Platform } from 'react-native';
 
+export type PostStatus = "REQUESTING" | "ACCEPTED" | "REJECTED";
 export interface Post {
     id: string;
     title: string;
@@ -18,7 +19,7 @@ export interface Post {
     image_url: string;
     ingredients: string[];
     created_at: string;
-    status: "REQUESTING" | "ACCEPTED" | "REJECTED";
+    status: PostStatus;
     synced: boolean;
 }
 
@@ -38,6 +39,7 @@ interface PostState {
     findPost: (postId: string) => Post | undefined;
     updatePost: (postId: string, content: PostAddOrEdit) => Promise<void>;
     toggleLike: (postId: string) => Promise<void>;
+    updatePostStatus: (postId: string, status: PostStatus) => Promise<void>;
 }
 
 const isWeb = Platform.OS === 'web';
@@ -59,10 +61,7 @@ export const usePostStore = create<PostState>()(
                      users(name)
                     `).order('created_at', { ascending: false });
 
-                    console.log(data, error);
-
                     if (error) throw error;
-
 
                     // Process the nested data
                     const processedData: Post[] = data?.map(post => ({
@@ -207,8 +206,41 @@ export const usePostStore = create<PostState>()(
                     set({ posts: originalPosts });
                     throw error;
                 }
+            },
+            updatePostStatus: async (postId: string, status: PostStatus) => {
+                const originalPosts: Post[] = structuredClone(get().posts);
+                // Optimistic update
+                set({
+                    posts: get().posts.map(post =>
+                        post.id === postId ? { ...post, status } : post
+                    ),
+                });
+
+                set({ loading: true });
+                try {
+                    const { data, error } = await supabase
+                        .from('recycle_post')
+                        .update({ status })
+                        .eq('id', postId)
+                        .select();
+
+                    if (error) throw error;
+
+                    set({
+                        posts: get().posts.map(post =>
+                            post.id === postId ? { ...post, status: data[0].status } : post
+                        ),
+                    });
+                } catch (error) {
+                    // Revert to original state in case of error
+                    set({ posts: originalPosts });
+                    throw error;
+                } finally {
+                    set({ loading: false });
+                }
             }
         }),
+
         {
             name: 'post-storage',
             storage: {
@@ -255,6 +287,7 @@ export const usePostStore = create<PostState>()(
                 findPost: state.findPost,
                 updatePost: state.updatePost,
                 toggleLike: state.toggleLike,
+                updatePostStatus: state.updatePostStatus,
             }), // Only persist posts and loading state
         }
     )
