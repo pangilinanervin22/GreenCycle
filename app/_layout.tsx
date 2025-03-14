@@ -54,8 +54,6 @@ function RootLayoutNav() {
     initializeAuth();
   }, []);
 
-  console.log('Is Admin:', isAdmin());
-
   return (
     <ThemeProvider value={DefaultTheme}>
       <Stack
