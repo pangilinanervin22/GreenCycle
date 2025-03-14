@@ -1,83 +1,72 @@
-import { ScrollView, StyleSheet, Text, View, Pressable, ActivityIndicator } from 'react-native';
+import { FlatList, StyleSheet, Text, View, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
-import { useEffect } from 'react';
 import { Image } from 'expo-image';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+import { useAuthStore } from '@/lib/AuthStore';
+import { FontAwesome } from '@expo/vector-icons';
 
-export default function PostLayout() {
-  const { fetchPosts, posts, loading } = usePostStore();
+export default function PostLikesLayout() {
+  const { user } = useAuthStore();
+  const { fetchPosts, posts } = usePostStore();
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchPosts();
+    }, [])
+  );
+
+  const likedPosts = posts.filter(
+    (post) => post.status === 'ACCEPTED' && post.likes.users.includes(user?.id ?? '')
+  );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
-          <Text style={styles.loadingText}>Fetching posts...</Text>
+    <FlatList
+      style={styles.container}
+      data={likedPosts}
+      keyExtractor={(_, i) => i.toString()}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Your Liked Posts</Text>
+          <FontAwesome name="heart" size={24} color="red" />
         </View>
-      ) : (
-        <ScrollView style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Discover Recycle Ways</Text>
-            <Image
-              source={require('@/assets/images/logo.svg')}
-              style={styles.logo}
-              contentFit="contain"
-            />
-          </View>
-          {posts?.map((post, i) => (
-            <Pressable
-              key={i}
-              onPress={() => router.push(`/(tabs)/${post.id}`)}
-              style={styles.postContainer}
-            >
-              <Image
-                source={{ uri: post.image_url }}
-                style={styles.postImage}
-                contentFit="cover"
-              />
-              <Text style={[styles.title, styles.postTitle]}>{post.title}</Text>
-              <Text style={styles.body}>{post.description}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+      }
+      ListEmptyComponent={<Text>No liked posts found.</Text>}
+      renderItem={({ item }) => (
+        <Pressable
+          onPress={() => router.push(`/(tabs)/${item.id}`)}
+          style={styles.postContainer}
+        >
+          <Image
+            source={{ uri: item.image_url }}
+            style={styles.postImage}
+            contentFit="cover"
+          />
+          <Text style={[styles.title, styles.postTitle]}>{item.title}</Text>
+          <Text style={styles.body}>{item.description}</Text>
+        </Pressable>
       )}
-    </View>
+    />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
-    paddingHorizontal: 20,
-    justifyContent: 'space-between',
-  },
-  logo: {
-    width: 60,
-    height: 60,
+    marginTop: 20,
+    gap: 10,
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 18,
-    color: '#333',
   },
   title: {
     color: '#000',
