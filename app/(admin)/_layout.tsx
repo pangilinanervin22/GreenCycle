@@ -85,8 +85,7 @@ export default function TabLayout() {
         name="manage"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
-          headerTitle: () => <DefaultTitleHeader />,
-          headerLeft: () => <AnimatedBackButton />,
+          header: () => null,
         }}
       />
       <Tabs.Screen
@@ -95,15 +94,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
           headerLeft: () => <AnimatedBackButton />,
-        }}
-      />
-      <Tabs.Screen
-        name="[id]"
-        options={{
-          title: 'Profile',
-          href: null,
-          header: () => null,
-
         }}
       />
     </Tabs>
