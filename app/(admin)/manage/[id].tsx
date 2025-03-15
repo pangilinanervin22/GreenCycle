@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'expo-image';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -9,9 +9,28 @@ import { PostStatus } from '@/lib/PostStore';
 
 export default function PostDetail() {
     const { id } = useLocalSearchParams();
+    const router = useRouter();
     const { findPost, updatePostStatus } = usePostStore();
     const currentPost = findPost(id as string);
     const [currentStatus, setCurrentStatus] = useState(currentPost?.status || '');
+
+    const handleStatusChange = async (newStatus: PostStatus) => {
+        try {
+            // Check if the status is the same
+            if (newStatus === currentStatus) {
+                Alert.alert('Error', 'Status is already set to ' + newStatus);
+                return;
+            }
+
+            // Update the post status
+            await updatePostStatus(id as string, newStatus);
+            setCurrentStatus(newStatus);
+            Alert.alert('Success', 'Status updated successfully');
+            router.back();
+        } catch (error) {
+            Alert.alert('Error', 'Failed to update status');
+        }
+    };
 
     if (!currentPost) {
         return (
@@ -20,26 +39,6 @@ export default function PostDetail() {
             </View>
         );
     }
-
-    const handleStatusChange = async (newStatus: PostStatus) => {
-        try {
-            await updatePostStatus(id as string, newStatus);
-            setCurrentStatus(newStatus);
-            Alert.alert('Success', 'Status updated successfully');
-        } catch (error) {
-            Alert.alert('Error', 'Failed to update status');
-            console.error('Status update failed:', error);
-        }
-    };
-
-    const getStatusStyle = (status: string) => {
-        switch (status) {
-            case 'ACCEPTED': return styles.acceptedStatus;
-            case 'REQUESTING': return styles.requestingStatus;
-            case 'REJECTED': return styles.rejectedStatus;
-            default: return styles.defaultStatus;
-        }
-    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -115,6 +114,15 @@ export default function PostDetail() {
         </ScrollView>
     );
 }
+
+const getStatusStyle = (status: string) => {
+    switch (status) {
+        case 'ACCEPTED': return styles.acceptedStatus;
+        case 'REQUESTING': return styles.requestingStatus;
+        case 'REJECTED': return styles.rejectedStatus;
+        default: return styles.defaultStatus;
+    }
+};
 
 const styles = StyleSheet.create({
     container: {
