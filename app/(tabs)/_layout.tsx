@@ -95,6 +95,7 @@ export default function TabLayout() {
         name="post"
         options={{
           title: "Likes",
+          href: "/post",
           tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
           headerLeft: () => <AnimatedBackButton />,
@@ -103,6 +104,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="create"
         options={{
+          href: "/create",
           tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
           headerLeft: () => <AnimatedBackButton />,
@@ -121,6 +123,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
+          href: "/profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
           headerLeft: () => <AnimatedBackButton />,
