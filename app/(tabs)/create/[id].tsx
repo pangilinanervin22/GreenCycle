@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 12,
         backgroundColor: "#F8F8F8",
-        paddingBottom: '30%',
+        paddingBottom: '20%',
         marginBottom: '20%',
     },
     title: {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
@@ -10,13 +10,13 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { set, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "@/lib/supabase";
 import { usePostStore } from "@/lib/PostStore";
 import { ScrollView } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 const recipeSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -34,7 +34,7 @@ export default function RecipeForm() {
   const [currentIngredient, setCurrentIngredient] = useState("");
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { createPost, loading } = usePostStore();
+  const { createPost } = usePostStore();
   const {
     control,
     handleSubmit,
@@ -131,6 +131,20 @@ export default function RecipeForm() {
       Alert.alert("Error creating recipe");
     }
   };
+
+  // reset form when unmount 
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        // Reset when screen loses focus
+        reset();
+        setCurrentIngredient('');
+        setSelectedImage(null);
+        setUploading(false);
+      };
+    }, [])
+  );
+
 
   return (
     <ScrollView
@@ -259,6 +273,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
     backgroundColor: "#F8F8F8",
+    paddingBottom: '20%',
+    marginBottom: '10%',
   },
   title: {
     fontSize: 24,
@@ -279,7 +295,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     backgroundColor: "white",
-    height: 80,
+    height: '20%',
+    textAlignVertical: 'top',
   },
   label: {
     fontSize: 16,
