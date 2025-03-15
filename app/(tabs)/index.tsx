@@ -1,14 +1,23 @@
-import { useState, useCallback } from 'react';
-import { ScrollView, StyleSheet, Text, View, Pressable, TextInput, ActivityIndicator } from 'react-native';
-import { router } from 'expo-router';
-import { usePostStore } from '@/lib/PostStore';
-import { Image } from 'expo-image';
-import { useFocusEffect } from '@react-navigation/native';
-import { FontAwesome } from '@expo/vector-icons';
+import { useState, useCallback } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  TextInput,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
+import { router } from "expo-router";
+import { usePostStore } from "@/lib/PostStore";
+import { Image } from "expo-image";
+import { useFocusEffect } from "@react-navigation/native";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function TabOneScreen() {
   const { fetchPosts, posts, loading } = usePostStore();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
   useFocusEffect(
@@ -26,17 +35,27 @@ export default function TabOneScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Discover Recycle Ways</Text>
         <Image
-          source={require('@/assets/images/logo.svg')}
+          source={require("@/assets/images/logo.svg")}
           style={styles.logo}
           contentFit="contain"
         />
       </View>
 
-      <View style={[styles.searchContainer, isFocused && styles.searchContainerFocused]}>
-        <FontAwesome name="search" size={20} color="green" style={styles.searchIcon} />
+      <View
+        style={[
+          styles.searchContainer,
+          isFocused && styles.searchContainerFocused,
+        ]}
+      >
+        <FontAwesome
+          name="search"
+          size={20}
+          color="#00512C"
+          style={styles.searchIcon}
+        />
         <TextInput
           placeholder="Search posts..."
-          placeholderTextColor="green"
+          placeholderTextColor="#00512C"
           style={styles.searchInput}
           value={searchTerm}
           onChangeText={setSearchTerm}
@@ -56,33 +75,31 @@ export default function TabOneScreen() {
             <Text>No posts found.</Text>
           </View>
         ) : (
-          filteredPosts.map((post, index) => (
-            <Pressable
-              key={index}
-              onPress={() => router.push(`/(tabs)/${post.id}`)}
-              style={styles.postContainer}
-            >
-              <Image
-                source={{ uri: post.image_url }}
-                style={styles.postImage}
-                contentFit="cover"
-              />
-              <Text style={[styles.title, styles.postTitle]}>
-                {post.title}
-              </Text>
-              <View style={styles.likesContainer}>
-                <FontAwesome
-                  name="heart"
-                  size={16}
-                  color="red"
-                  style={styles.likeIcon}
+          <View style={styles.postsWrapper}>
+            {filteredPosts.map((post, index) => (
+              <Pressable
+                key={index}
+                onPress={() => router.push(`/(tabs)/${post.id}`)}
+                style={styles.postContainer}
+              >
+                <Image
+                  source={{ uri: post.image_url }}
+                  style={styles.postImage}
+                  contentFit="cover"
                 />
-                <Text style={styles.likesText}>
-                  {post.likes.count}
-                </Text>
-              </View>
-            </Pressable>
-          ))
+                <Text style={styles.postTitle}>{post.title}</Text>
+                <View style={styles.likesContainer}>
+                  <FontAwesome
+                    name="heart"
+                    size={16}
+                    color="#00512C"
+                    style={styles.likeIcon}
+                  />
+                  <Text style={styles.likesText}>{post.likes.count}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
         )}
       </ScrollView>
     </View>
@@ -91,18 +108,18 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    width: '100%',
     flex: 1,
+    alignItems: "center",
+    backgroundColor: "#fff",
+    marginBottom: 50,
+    width: "100%",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 20,
-    justifyContent: 'space-between',
-    width: '90%',
+    justifyContent: "space-between",
+    width: "90%",
   },
   logo: {
     width: 60,
@@ -110,23 +127,23 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#00512C",
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '90%',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "90%",
     marginBottom: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: 'green',
+    borderColor: "#00512C",
   },
   searchContainerFocused: {
-    // Change this to your desired highlight color or style on focus.
-    borderColor: 'blue',
+    borderColor: "#1CA365",
+    backgroundColor: "#DFF8E3",
   },
   searchIcon: {
     marginRight: 8,
@@ -134,60 +151,62 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    color: 'green',
+    color: "#00512C",
   },
   scrollContainer: {
-    width: '100%',
-    marginBottom: '20%',
+    width: "100%",
   },
-  title: {
-    color: '#000',
-    fontSize: 18,
-    fontWeight: 'bold',
+  postsWrapper: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    width: "100%",
+    paddingHorizontal: "5%",
   },
   postContainer: {
-    marginVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    paddingHorizontal: '10%',
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: '#f8f8f8',
-    shadowColor: '#000',
+    width: "48%",
+    marginBottom: 10,
+    marginHorizontal: "1%",
+    alignItems: "center",
+    padding: 5,
+    borderRadius: 12,
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   postImage: {
-    width: '100%',
-    height: 150,
+    width: "100%",
+    aspectRatio: 16 / 15,
     borderRadius: 8,
     marginBottom: 8,
   },
   postTitle: {
     marginBottom: 4,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   likesContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
   },
   likeIcon: {
     marginRight: 6,
   },
   likesText: {
-    color: '#333',
+    color: "#333",
     fontSize: 16,
   },
   loadingContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 50,
   },
   noPostsContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 50,
   },
 });
