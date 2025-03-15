@@ -1,22 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
     Alert,
-    Button,
     StyleSheet,
     TextInput,
     View,
     Text,
     TouchableOpacity,
-    Image,
 } from "react-native";
-import { set, z } from "zod";
+import { Image } from "expo-image";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "@/lib/supabase";
 import { usePostStore } from "@/lib/PostStore";
 import { ScrollView } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 const recipeSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -31,10 +30,32 @@ type RecipeFormData = z.infer<typeof recipeSchema>;
 
 export default function RecipeFormEdit() {
     const router = useRouter();
+    const { id } = useLocalSearchParams();
     const [currentIngredient, setCurrentIngredient] = useState("");
     const [uploading, setUploading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const { createPost } = usePostStore();
+    const [postId, setPostId] = useState<string | null>(null);
+    const { createPost, updatePost, findPost } = usePostStore();
+
+    const currentPost = findPost(id as string);
+
+    useEffect(() => {
+        if (id) {
+            setPostId(id as string);
+            if (currentPost) {
+                const { title, description, ingredients, image_url } = currentPost;
+                setValue("title", title);
+                setValue("description", description);
+                setValue("ingredients", ingredients);
+                setValue("image_url", image_url);
+                setSelectedImage(image_url);
+            } else {
+                Alert.alert("Post not found", "The post you are trying to edit does not exist");
+                router.push("/(tabs)/profile");
+            }
+        }
+    }, [id]);
+
     const {
         control,
         handleSubmit,
@@ -45,9 +66,10 @@ export default function RecipeFormEdit() {
     } = useForm<RecipeFormData>({
         resolver: zodResolver(recipeSchema),
         defaultValues: {
-            title: "",
-            description: "",
-            ingredients: [],
+            title: currentPost?.title || "",
+            description: currentPost?.description || "",
+            ingredients: currentPost?.ingredients || [],
+            image_url: currentPost?.image_url || "",
         },
     });
 
@@ -73,6 +95,7 @@ export default function RecipeFormEdit() {
             allowsEditing: true,
             quality: 1,
         });
+
         if (!result.canceled) {
             const image = result.assets[0];
             setSelectedImage(image.uri);
@@ -89,16 +112,10 @@ export default function RecipeFormEdit() {
             if (error) throw error;
             const url = supabase.storage.from("post_image").getPublicUrl(data.path);
             setValue("image_url", url.data.publicUrl);
-
-            console.log("Image uploaded:", url.data.publicUrl, url);
-
             return url.data.publicUrl;
         } catch (error: any) {
-            Alert.alert(
-                "Error uploading image",
-                error?.message || "An error occurred"
-            );
-            console.error("Error uploading image:", error);
+            Alert.alert("Error uploading image", error?.message || "An error occurred");
+            throw error;
         } finally {
             setUploading(false);
         }
@@ -106,9 +123,13 @@ export default function RecipeFormEdit() {
 
     const onSubmit = async (data: RecipeFormData) => {
         try {
-            let imageUrl: string | undefined;
-            if (selectedImage) {
+            let imageUrl = data.image_url;
+
+            if (selectedImage && !selectedImage.startsWith("https://")) {
                 imageUrl = await uploadImage(selectedImage);
+            } else {
+                console.log("Image URL: ", imageUrl);
+                console.log("no image uploaded");
             }
 
             const post = {
@@ -118,17 +139,20 @@ export default function RecipeFormEdit() {
                 ingredients: data.ingredients,
             };
 
-            setSelectedImage(null);
-            setCurrentIngredient("");
-            reset();
+            if (postId) {
+                await updatePost(postId, post);
+                Alert.alert("Recipe updated successfully!");
+            } else {
+                await createPost(post);
+                Alert.alert("Recipe created successfully!");
+            }
 
-            console.log(post);
-
-            await createPost(post);
-            Alert.alert("Recipe created successfully!");
             router.push("/(tabs)");
         } catch (error) {
-            Alert.alert("Error creating recipe");
+            Alert.alert("Error saving recipe");
+        } finally {
+            setSelectedImage(null);
+            reset();
         }
     };
 
@@ -138,11 +162,15 @@ export default function RecipeFormEdit() {
             contentContainerStyle={styles.contentContainer}
         >
             <View style={styles.container}>
-                <Text style={styles.title}>Add Recycle Ways</Text>
-                <Text style={styles.desc}>
-                    You can add your own recycle ways on any fruit or vegetable you want
-                    and share your ideas to everyone{" "}
+                <Text style={styles.title}>
+                    {postId ? "Edit Recycle Ways" : "Add Recycle Ways"}
                 </Text>
+                <Text style={styles.desc}>
+                    {postId
+                        ? "Edit your recycling method below"
+                        : "Share your recycling ideas with everyone"}
+                </Text>
+
                 <Text style={styles.label}>Name of Product</Text>
                 <Controller
                     control={control}
@@ -150,7 +178,7 @@ export default function RecipeFormEdit() {
                         <TextInput
                             style={styles.input}
                             placeholder="Enter Name of Product"
-                            placeholderTextColor="grey" // Sets placeholder color
+                            placeholderTextColor="grey"
                             onBlur={onBlur}
                             onChangeText={onChange}
                             value={value}
@@ -158,9 +186,7 @@ export default function RecipeFormEdit() {
                     )}
                     name="title"
                 />
-                {errors.title && (
-                    <Text style={styles.error}>{errors.title.message}</Text>
-                )}
+                {errors.title && <Text style={styles.error}>{errors.title.message}</Text>}
 
                 <Text style={styles.label}>Description</Text>
                 <Controller
@@ -184,7 +210,9 @@ export default function RecipeFormEdit() {
 
                 <Text style={styles.label}>Ingredients</Text>
                 <Text style={styles.labeldesc}>
-                    Add all the ingredient of your product including their measurements
+                    {postId
+                        ? "Edit your product's ingredients"
+                        : "Add all ingredients including measurements"}
                 </Text>
                 <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
                     <Text style={styles.addButtonText}>+ Add Ingredients</Text>
@@ -213,7 +241,7 @@ export default function RecipeFormEdit() {
                 <View style={styles.imageContainer}>
                     <Text style={styles.imageLabel}>Image</Text>
                     <Text style={styles.imagedesc}>
-                        add image to present your product
+                        {postId ? "Update product image" : "Add product image"}
                     </Text>
                     <TouchableOpacity
                         style={styles.imageButton}
@@ -231,7 +259,10 @@ export default function RecipeFormEdit() {
                                 style={styles.imagePreview}
                             />
                             <TouchableOpacity
-                                onPress={() => setSelectedImage(null)}
+                                onPress={() => {
+                                    setSelectedImage(null);
+                                    setValue("image_url", "");
+                                }}
                                 style={styles.removeImageButton}
                             >
                                 <Text style={styles.removeText}>Remove</Text>
@@ -244,7 +275,9 @@ export default function RecipeFormEdit() {
                     style={styles.submitButton}
                     onPress={handleSubmit(onSubmit)}
                 >
-                    <Text style={styles.submitButtonText}>Submit Recipe</Text>
+                    <Text style={styles.submitButtonText}>
+                        {postId ? "Update Recipe" : "Submit Recipe"}
+                    </Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
@@ -259,6 +292,8 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 12,
         backgroundColor: "#F8F8F8",
+        paddingBottom: '30%',
+        marginBottom: '20%',
     },
     title: {
         fontSize: 24,
@@ -279,7 +314,8 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 20,
         backgroundColor: "white",
-        height: 80,
+        height: '20%',
+        textAlignVertical: 'top',
     },
     label: {
         fontSize: 16,
