@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Redirect, router, Tabs } from 'expo-router';
+import React, { useEffect, useRef } from "react";
+import { Animated, Pressable } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Redirect, router, Tabs } from "expo-router";
 
-import { useAuthStore } from '@/lib/AuthStore';
-import DefaultLoading from '@/components/DefaultLoading';
-import DefaultTitleHeader from '@/components/DefaultHeader';
+import { useAuthStore } from "@/lib/AuthStore";
+import DefaultLoading from "@/components/DefaultLoading";
+import DefaultTitleHeader from "@/components/DefaultHeader";
 
 function AnimatedBackButton() {
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -38,8 +38,17 @@ function AnimatedBackButton() {
   );
 }
 
-function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>['name']; color: string }) {
-  return <FontAwesome size={28} style={{ color: props.color, position: 'absolute' }} {...props} />;
+function TabBarIcon(props: {
+  name: React.ComponentProps<typeof FontAwesome>["name"];
+  color: string;
+}) {
+  return (
+    <FontAwesome
+      size={28}
+      style={{ color: props.color, position: "absolute" }}
+      {...props}
+    />
+  );
 }
 
 export default function TabLayout() {
@@ -51,24 +60,24 @@ export default function TabLayout() {
 
   if (loading) return <DefaultLoading loading={loading} />;
   if (!user) return <Redirect href="/start" />;
-  if (user.role === 'admin') return <Redirect href="/(admin)" />;
+  if (user.role === "admin") return <Redirect href="/(admin)" />;
 
   return (
     <Tabs
       screenOptions={{
         tabBarShowLabel: true,
-        tabBarActiveTintColor: 'green',
+        tabBarActiveTintColor: "green",
         tabBarStyle: {
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          backgroundColor: 'white',
+          backgroundColor: "white",
           height: 60,
-          position: 'absolute',
+          position: "absolute",
           paddingTop: 5,
         },
-        headerTitleAlign: 'center',
+        headerTitleAlign: "center",
         headerStyle: {
-          backgroundColor: '#ECE9E5',
+          backgroundColor: "#ECE9E5",
           elevation: 0,
           height: 70,
         },
@@ -77,7 +86,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           header: () => null,
         }}
@@ -85,7 +94,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="post"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="leaf" color={color} />,
+          title: "Likes",
+          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
           headerLeft: () => <AnimatedBackButton />,
         }}
@@ -101,7 +111,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="[id]"
         options={{
-          title: 'Profile',
+          title: "Profile",
           href: null,
           header: () => null,
           // headerTitle: () => <DefaultTitleHeader />,
