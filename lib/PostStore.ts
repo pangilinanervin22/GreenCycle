@@ -44,6 +44,7 @@ interface PostState {
 
 const isWeb = Platform.OS === 'web';
 
+
 export const usePostStore = create<PostState>()(
     persist(
         (set, get) => ({
@@ -51,7 +52,8 @@ export const usePostStore = create<PostState>()(
             loading: false,
             fetchPosts: async () => {
                 set({ loading: true });
-                const originalState = structuredClone(get().posts);
+                const originalState = JSON.parse(JSON.stringify(get().posts));
+
                 try {
                     const { data, error } = await supabase
                         .from('recycle_post')
@@ -77,6 +79,7 @@ export const usePostStore = create<PostState>()(
                     set({ posts: processedData || [] });
                 } catch (error) {
                     set({ posts: originalState });
+
                     throw error;
                 } finally {
                     set({ loading: false });
@@ -146,9 +149,15 @@ export const usePostStore = create<PostState>()(
             updatePost: async (postId: string, content: PostAddOrEdit) => {
                 set({ loading: true });
                 try {
-                    const { data, error } = await supabase
+
+                    const updatePost = {
+                        ...JSON.parse(JSON.stringify(content)),
+                        status: "REQUESTING"
+                    }
+
+                    const { error } = await supabase
                         .from('recycle_post')
-                        .update(content)
+                        .update(updatePost)
                         .eq('id', postId)
                         .select();
 
@@ -156,7 +165,7 @@ export const usePostStore = create<PostState>()(
 
                     set({
                         posts: get().posts.map(post =>
-                            post.id === postId ? data[0] : post
+                            post.id === postId ? { ...JSON.parse(JSON.stringify(content)) } : post
                         ),
                     });
                 } finally {
@@ -208,7 +217,7 @@ export const usePostStore = create<PostState>()(
                 }
             },
             updatePostStatus: async (postId: string, status: PostStatus) => {
-                const originalPosts: Post[] = structuredClone(get().posts);
+                const originalPosts: Post[] = JSON.parse(JSON.stringify(get().posts));
                 // Optimistic update
                 set({
                     posts: get().posts.map(post =>
