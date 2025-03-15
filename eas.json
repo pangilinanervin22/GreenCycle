@@ -1,0 +1,34 @@
+{
+        "build": {
+                "production": {
+                        "distribution": "store",
+                        "releaseChannel": "production",
+                        "android": {
+                                "buildType": "apk",
+                                "gradleCommand": ":app:assembleRelease"
+                        },
+                        "ios": {
+                                "simulator": false
+                        }
+                },
+                "preview": {
+                        "distribution": "internal",
+                        "releaseChannel": "preview",
+                        "android": {
+                                "buildType": "apk"
+                        },
+                        "ios": {
+                                "simulator": true
+                        }
+                },
+                "development": {
+                        "distribution": "internal",
+                        "android": {
+                                "buildType": "apk"
+                        },
+                        "ios": {
+                                "simulator": true
+                        }
+                }
+        }
+}
