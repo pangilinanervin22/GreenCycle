@@ -1,12 +1,29 @@
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 import React from "react";
-import { Text } from "react-native";
 
 export default function Profile() {
     return (
-        <>
-            <Slot />
-        </>
+        <Stack
+            screenOptions={{
+                headerTitleStyle: {
+                    color: 'black',
+                    fontSize: 18
+                }
+            }}
+        >
+            <Stack.Screen
+                name="index"
+                options={{
+                    header: () => null,
+                }}
+            />
+            <Stack.Screen
+                name="[id]"
+                options={{
+                    header: () => null,
+                }}
+            />
+        </Stack>
     );
 }
 
