@@ -2,9 +2,10 @@
 import * as SecureStore from 'expo-secure-store';
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
+import Constants from "expo-constants";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL as string;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY as string;
+const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl;
+const supabaseKey = Constants.expoConfig?.extra?.supabaseKey;
 
 const isWeb = Platform.OS === 'web';
 
@@ -43,7 +44,7 @@ export const storage = {
     },
 };
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
         storage: storage, // Use the platform-specific storage adapter
         autoRefreshToken: true,
