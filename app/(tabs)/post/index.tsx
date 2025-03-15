@@ -1,5 +1,4 @@
 import {
-  ScrollView,
   FlatList,
   StyleSheet,
   Text,
@@ -30,39 +29,35 @@ export default function PostLikesLayout() {
   );
 
   return (
-    <ScrollView
-      style={styles.scrollContainer}
-      contentContainerStyle={styles.scrollContent}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Your Liked Posts</Text>
-        <FontAwesome name="heart" size={24} color="#00512C" />
-      </View>
-
-      {likedPosts.length === 0 ? (
+    <FlatList
+      data={likedPosts}
+      keyExtractor={(_, i) => i.toString()}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Your Liked Posts</Text>
+          <FontAwesome name="heart" size={24} color="#00512C" />
+        </View>
+      }
+      ListEmptyComponent={
         <Text style={styles.emptyText}>No liked posts found.</Text>
-      ) : (
-        <FlatList
-          data={likedPosts}
-          keyExtractor={(_, i) => i.toString()}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => router.push(`/(tabs)/${item.id}`)}
-              style={styles.postContainer}
-            >
-              <Image
-                source={{ uri: item.image_url }}
-                style={styles.postImage}
-                contentFit="cover"
-              />
-              <Text style={[styles.title, styles.postTitle]}>{item.title}</Text>
-              <Text style={styles.body}>{item.description}</Text>
-            </Pressable>
-          )}
-          nestedScrollEnabled
-        />
+      }
+      renderItem={({ item }) => (
+        <Pressable
+          onPress={() => router.push(`/(tabs)/${item.id}`)}
+          style={styles.postContainer}
+        >
+          <Image
+            source={{ uri: item.image_url }}
+            style={styles.postImage}
+            contentFit="cover"
+          />
+          <Text style={[styles.title, styles.postTitle]}>{item.title}</Text>
+          <Text style={styles.body}>{item.description}</Text>
+        </Pressable>
       )}
-    </ScrollView>
+      contentContainerStyle={styles.scrollContent}
+      style={styles.scrollContainer}
+    />
   );
 }
 
