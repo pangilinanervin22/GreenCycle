@@ -75,10 +75,10 @@ export default function ManageLayout() {
 
           {/* Table Header */}
           <View style={styles.tableHeader}>
-            <Text style={[styles.headerText, { flex: 2 }]}>Title</Text>
-            <Text style={styles.headerText}>Author</Text>
+            <Text style={[styles.headerText, { flex: 1 }]}>Title</Text>
+            <Text style={[styles.headerText, { flex: 0.8 }]}>Author</Text>
             <Text style={styles.headerText}>Status</Text>
-            <Text style={styles.headerText}>Action</Text>
+            <Text style={[styles.headerText, { flex: 0.5 }]}>Action</Text>
           </View>
 
           {/* Table Rows */}
@@ -86,8 +86,8 @@ export default function ManageLayout() {
             const statusStyle = getStatusStyle(post.status);
             return (
               <View key={i} style={styles.tableRow}>
-                <Text style={[styles.cell, { flex: 2 }]} numberOfLines={1}>{post.title}</Text>
-                <Text style={styles.cell} numberOfLines={1}>{post.author_name}</Text>
+                <Text style={[styles.cell, { flex: 1 }]} numberOfLines={1}>{post.title}</Text>
+                <Text style={[styles.cell, { flex: 0.8 }]} numberOfLines={1}>{post.author_name}</Text>
                 <View style={styles.cell}>
                   <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}>
                     <Text style={[styles.statusText, { color: statusStyle.textColor }]}>
@@ -96,17 +96,18 @@ export default function ManageLayout() {
                   </View>
                 </View>
                 <Pressable
-                  style={styles.actionButton}
+                  style={[styles.actionButton, { flex: 0.5 }]}
                   onPress={() => router.push(`/(admin)/manage/${post.id}`)}
                 >
-                  <Text style={styles.actionText}>View</Text>
+                  <FontAwesome name="eye" size={16} color="white" />
                 </Pressable>
               </View>
             )
           })}
         </ScrollView>
-      )}
-    </View>
+      )
+      }
+    </View >
   );
 }
 
@@ -114,6 +115,8 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingHorizontal: 16,
+    marginBottom: '20%',
+    paddingBottom: '30%',
   },
   header: {
     paddingVertical: 20,
@@ -150,6 +153,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#e8f5e9',
     paddingVertical: 12,
+    paddingHorizontal: 8,
     borderRadius: 8,
     marginBottom: 8,
     gap: 8,
@@ -167,7 +171,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1b5e20',
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 16,
   },
   cell: {
     flex: 1,
@@ -175,6 +179,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     justifyContent: 'center',
+    wordWrap: 'break-word',
   },
   statusBadge: {
     borderRadius: 12,
@@ -188,16 +193,10 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     backgroundColor: '#43a047',
-    paddingVertical: 6,
+    padding: 8,
     borderRadius: 6,
-    flex: 1,
-    maxWidth: 80,
-  },
-  actionText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '500',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingContainer: {
     flex: 1,
