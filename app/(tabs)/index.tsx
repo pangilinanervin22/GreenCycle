@@ -26,8 +26,10 @@ export default function TabOneScreen() {
     }, [])
   );
 
+  console.log("render", loading);
+
   const filteredPosts = posts.filter((post) =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase())
+    post.status === "ACCEPTED" && post.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -61,6 +63,8 @@ export default function TabOneScreen() {
           onChangeText={setSearchTerm}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          underlineColorAndroid="transparent" // Add this for Android
+          selectionColor="#1CA365" // Optional: customize cursor color
         />
       </View>
 
@@ -117,18 +121,22 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
     marginVertical: 20,
-    justifyContent: "space-between",
     width: "90%",
   },
   logo: {
     width: 60,
     height: 60,
+    paddingLeft: 20,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: "bold",
     color: "#00512C",
+    wordWrap: "break-word",
+    width: "70%",
   },
   searchContainer: {
     flexDirection: "row",
@@ -152,6 +160,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     color: "#00512C",
+    outlineColor: "#00512C",
+    outline: "none",
   },
   scrollContainer: {
     width: "100%",
@@ -162,6 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     paddingHorizontal: "5%",
+    marginBottom: '10%',
   },
   postContainer: {
     width: "48%",
@@ -170,10 +181,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 5,
     borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 2,
+    backgroundColor: "#f8f8f8",
   },
   postImage: {
     width: "100%",
@@ -182,15 +191,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   postTitle: {
-    marginBottom: 4,
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+    width: "100%",
   },
   likesContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 4,
+    marginVertical: 4,
   },
   likeIcon: {
     marginRight: 6,

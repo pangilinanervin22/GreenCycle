@@ -10,7 +10,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/lib/AuthStore";
-import { Ionicons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 interface ProfileFormData {
@@ -51,15 +50,7 @@ export default function ProfileDetails() {
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.push("/profile")}
-      >
-        <FontAwesome name="arrow-left" size={20} color="#00512C" />
-      </TouchableOpacity>
-
       <Text style={styles.title}>Edit Your Profile</Text>
-
       {/* Name Field */}
       <Text style={styles.label}>Name: </Text>
       <Controller
@@ -126,26 +117,12 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f8f9fa",
   },
-  backButton: {
-    position: "absolute",
-    top: 30,
-    left: 15,
-    zIndex: 10,
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 50,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
   title: {
     fontWeight: "bold",
     fontSize: 24,
     textAlign: "center",
     color: "#00512C",
     marginBottom: 16,
-    marginTop: 60,
   },
   input: {
     borderWidth: 1,
