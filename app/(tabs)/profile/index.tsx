@@ -38,13 +38,14 @@ export default function ProfilePage() {
                         <TouchableOpacity
                             key={post.id}
                             style={styles.postCard}
-                            onPress={() => router.push(`/(tabs)/${post.id}`)}
+                            onPress={() => router.push(`/(tabs)/create/${post.id}`)}
                         >
                             {post.image_url && (
                                 <Image
                                     source={{ uri: post.image_url }}
                                     style={styles.postImage}
                                     contentFit="cover"
+                                    cachePolicy={'memory'}
                                 />
                             )}
                             <Text style={styles.postTitle}>{post.title}</Text>
