@@ -40,6 +40,7 @@ export default function TabOneScreen() {
           source={require("@/assets/images/logo.svg")}
           style={styles.logo}
           contentFit="contain"
+          cachePolicy={"memory-disk"}
         />
       </View>
 
@@ -90,6 +91,7 @@ export default function TabOneScreen() {
                   source={{ uri: post.image_url }}
                   style={styles.postImage}
                   contentFit="cover"
+                  cachePolicy="memory"
                 />
                 <Text style={styles.postTitle}>{post.title}</Text>
                 <View style={styles.likesContainer}>

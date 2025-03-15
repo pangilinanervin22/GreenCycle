@@ -46,7 +46,7 @@ export default function PostDetail() {
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                 <FontAwesome name="arrow-left" size={20} color="#00512C" />
             </TouchableOpacity>
-            <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} />
+            <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} cachePolicy="memory-disk" />
             <View style={styles.allcontent}>
                 {/* Status Section */}
                 <View style={styles.statusSection}>

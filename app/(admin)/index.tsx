@@ -60,6 +60,7 @@ export default function AdminMainLayout() {
           source={require('@/assets/images/logo.svg')}
           style={styles.logo}
           contentFit="contain"
+          cachePolicy="memory-disk"
         />
       </View>
 

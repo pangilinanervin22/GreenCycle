@@ -174,6 +174,7 @@ export default function Signup() {
           source={require("../assets/images/signupbg.png")} // Replace with your actual image
           style={styles.backgroundImage}
           contentFit="cover"
+          cachePolicy={"memory-disk"}
         />
       </View>
     </View>
