@@ -29,18 +29,7 @@ export default function AdminMainLayout() {
     REQUESTING: filteredPosts('REQUESTING').length,
   };
 
-  const renderRecentActivity = ({ item }: { item: Post }) => (
-    <Pressable
-      style={styles.activityItem}
-      onPress={() => router.push(`/(admin)/manage/${item.id}`)}
-    >
-      <View style={[styles.statusIndicator, { backgroundColor: statusColors[item.status] }]} />
-      <Text style={styles.activityTitle}>{item.title || 'No Title'}</Text>
-      <FontAwesome name="chevron-right" size={14} color="#666" />
-    </Pressable>
-  );
-
-  if (loading) {
+  if (loading || posts.length === 0) {
     return (
       <DefaultLoading loading />
     );
