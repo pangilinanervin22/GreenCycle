@@ -19,7 +19,7 @@ export default function DefaultLoading({ loading }: DefaultLoadingProps) {
             />
             <Text style={styles.title}>Green Recycle</Text>
             <ActivityIndicator size="large" color="green" />
-            <Text style={styles.loadingText}>Loading...</Text>
+            <Text style={styles.loadingText}>{'Loading...'}</Text>
         </View>
     );
 }
@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     },
     loadingText: {
         marginVertical: 10,
-        color: 'gray',
+        color: '#00512C',
     },
 });
