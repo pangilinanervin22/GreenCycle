@@ -3,7 +3,7 @@ import "dotenv/config";
 export default {
     name: "GreenCycle",
     slug: "GreenCycle",
-    version: "1.0.0",
+    version: "1.0.1",
     orientation: "portrait",
     icon: "./assets/images/logo.png",
     scheme: "myapp",
@@ -13,7 +13,7 @@ export default {
     jsEngine: "hermes",
     splash: {
         image: "./assets/images/logo.png",
-        resizeMode: "contain",
+        resizeMode: "fill",
         backgroundColor: "#ffffff",
     },
     ios: {
@@ -22,7 +22,7 @@ export default {
     },
     android: {
         adaptiveIcon: {
-            foregroundImage: "./assets/images/logo.png",
+            foregroundImage: "./assets/images/adaptive-icon.jpg",
             backgroundColor: "#ffffff",
         },
         package: "com.pangilinanervin22.GreenCycle",
