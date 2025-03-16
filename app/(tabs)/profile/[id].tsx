@@ -50,6 +50,9 @@ export default function ProfileDetails() {
   return (
     <View style={styles.container}>
       {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <FontAwesome name="arrow-left" size={20} color="#00512C" />
+            </TouchableOpacity>
       <Text style={styles.title}>Edit Your Profile</Text>
       {/* Name Field */}
       <Text style={styles.label}>Name: </Text>
@@ -116,8 +119,24 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#f8f9fa",
+   
   },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 15,
+    zIndex: 10,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 50,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+
+},
   title: {
+    marginTop: '20%',
     fontWeight: "bold",
     fontSize: 24,
     textAlign: "center",
