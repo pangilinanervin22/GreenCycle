@@ -155,6 +155,20 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 20,
   },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 15,
+    zIndex: 10,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 50,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+
+  },
   title: {
     fontSize: 28,
     fontWeight: "800",
