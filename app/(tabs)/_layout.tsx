@@ -6,37 +6,8 @@ import { Redirect, router, Tabs } from "expo-router";
 import { useAuthStore } from "@/lib/AuthStore";
 import DefaultLoading from "@/components/DefaultLoading";
 import DefaultTitleHeader from "@/components/DefaultHeader";
+import { AnimatedBackButton } from "@/components/AnimatedBackButton";
 
-function AnimatedBackButton() {
-  const scaleValue = useRef(new Animated.Value(1)).current;
-
-  const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: 0.9,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleValue, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  return (
-    <Pressable
-      onPress={() => router.back()}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={{ padding: 20 }}
-    >
-      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-        <FontAwesome name="arrow-left" size={24} color="#00512C" />
-      </Animated.View>
-    </Pressable>
-  );
-}
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -97,8 +68,7 @@ export default function TabLayout() {
           title: "Likes",
           href: "/post",
           tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
-          headerTitle: () => <DefaultTitleHeader />,
-          headerLeft: () => <AnimatedBackButton />,
+          header: () => null,
         }}
       />
       <Tabs.Screen
@@ -107,10 +77,10 @@ export default function TabLayout() {
           href: "/create",
           tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
-          headerLeft: () => <AnimatedBackButton />,
+          headerLeft: () => <AnimatedBackButton trigger={() => router.push("/(tabs)")} />,
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="[id]"
         options={{
           title: "Profile",
@@ -119,14 +89,14 @@ export default function TabLayout() {
           // headerTitle: () => <DefaultTitleHeader />,
           // headerLeft: () => <AnimatedBackButton />,
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="profile"
         options={{
           href: "/profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           headerTitle: () => <DefaultTitleHeader />,
-          headerLeft: () => <AnimatedBackButton />,
+          headerLeft: () => <AnimatedBackButton trigger={() => router.back()} />,
         }}
       />
     </Tabs>

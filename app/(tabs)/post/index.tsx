@@ -43,7 +43,7 @@ export default function PostLikesLayout() {
       }
       renderItem={({ item }) => (
         <Pressable
-          onPress={() => router.push(`/(tabs)/${item.id}`)}
+          onPress={() => router.push(`/(tabs)/post/${item.id}`)}
           style={styles.postContainer}
         >
           <Image

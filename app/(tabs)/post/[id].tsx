@@ -1,14 +1,21 @@
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
+import { useCallback } from 'react';
 
 export default function PostDetail() {
     const { id } = useLocalSearchParams();
-    const { findPost, toggleLike } = usePostStore();
+    const { findPost, toggleLike, fetchPosts } = usePostStore();
+    const router = useRouter();
     const currentPost = findPost(id as string);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchPosts();
+        }, [])
+    );
 
     if (!currentPost) {
         return (
@@ -27,32 +34,37 @@ export default function PostDetail() {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                <FontAwesome name="arrow-left" size={20} color="#00512C" />
-            </TouchableOpacity>
-            <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} cachePolicy="memory-disk" />
-            <View style={styles.allcontent}>
-                <Text style={styles.title}>{currentPost.title}</Text>
-                <View style={styles.authorContainer}>
-                    <FontAwesome name="user" size={16} color="#00512C" style={styles.icon} />
-                    <Text style={styles.subtitle}>{currentPost.author_name}</Text>
-                </View>
-                <View style={styles.likesContainer}>
-                    <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
-                        <FontAwesome name="heart" size={16} color="#00512C" style={styles.icon} />
-                        <Text style={styles.subtitlelikes}>{currentPost.likes.count || 0}</Text>
+        <>
+            <ScrollView contentContainerStyle={styles.container}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                    <FontAwesome name="arrow-left" size={20} color="#00512C" />
+                </TouchableOpacity>
+                <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} cachePolicy="memory-disk" />
+                <View style={styles.allcontent}>
+                    <Text style={styles.title}>{currentPost.title}</Text>
+                    <TouchableOpacity
+                        style={styles.authorContainer}
+                        onPress={() => router.push(`/(tabs)/profile/${currentPost.author_id}`)}
+                    >
+                        <FontAwesome name="user" size={16} color="#00512C" style={styles.icon} />
+                        <Text style={styles.subtitle}>{currentPost.author_name}</Text>
                     </TouchableOpacity>
+                    <View style={styles.likesContainer}>
+                        <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
+                            <FontAwesome name="heart" size={16} color="#00512C" style={styles.icon} />
+                            <Text style={styles.subtitlelikes}>{currentPost.likes.count || 0}</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={styles.description}>{currentPost.description}</Text>
+                    <Text style={styles.subtitleIngredients}>Ingredients:</Text>
+                    {currentPost.ingredients?.map((ingredient, i) => (
+                        <Text key={i} style={styles.ingredientItem}>
+                            {ingredient}
+                        </Text>
+                    ))}
                 </View>
-                <Text style={styles.description}>{currentPost.description}</Text>
-                <Text style={styles.subtitleIngredients}>Ingredients:</Text>
-                {currentPost.ingredients?.map((ingredient, i) => (
-                    <Text key={i} style={styles.ingredientItem}>
-                        {ingredient}
-                    </Text>
-                ))}
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </>
     );
 }
 
