@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/lib/AuthStore";
 import Colors from "@/constants/Colors";
 import { FontAwesome } from "@expo/vector-icons";
+import DefaultLoading from "@/components/DefaultLoading";
 
 const loginSchema = z.object({
   email: z
@@ -46,9 +47,7 @@ export default function Login() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
+      <DefaultLoading loading />
     );
   }
 
