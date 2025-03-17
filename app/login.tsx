@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginTop: "20%",
     display: "flex",
-    bottom: "-10%",
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
@@ -256,6 +256,6 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     width: "140%",
-    height: "140%",
+    height: "100%",
   },
 });

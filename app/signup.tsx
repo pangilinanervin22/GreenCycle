@@ -174,7 +174,7 @@ export default function Signup() {
         <Image
           source={require("../assets/images/signupbg.png")} // Replace with your actual image
           style={styles.backgroundImage}
-          contentFit="cover"
+          contentFit="fill"
           cachePolicy={"memory-disk"}
         />
       </View>
@@ -284,9 +284,8 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   imageContainer: {
-    marginTop: "5%",
     display: "flex",
-    bottom: "2%",
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
@@ -295,6 +294,7 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     width: "120%",
-    height: "100%",
+    height: "120%",
+    zIndex: 10,
   },
 });
