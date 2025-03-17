@@ -34,7 +34,7 @@ export default function RecipeForm() {
   const [currentIngredient, setCurrentIngredient] = useState("");
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { createPost } = usePostStore();
+  const { createPost, loading } = usePostStore();
   const {
     control,
     handleSubmit,
@@ -90,15 +90,12 @@ export default function RecipeForm() {
       const url = supabase.storage.from("post_image").getPublicUrl(data.path);
       setValue("image_url", url.data.publicUrl);
 
-      console.log("Image uploaded:", url.data.publicUrl, url);
-
       return url.data.publicUrl;
     } catch (error: any) {
       Alert.alert(
         "Error uploading image",
         error?.message || "An error occurred"
       );
-      console.error("Error uploading image:", error);
     } finally {
       setUploading(false);
     }
@@ -106,6 +103,7 @@ export default function RecipeForm() {
 
   const onSubmit = async (data: RecipeFormData) => {
     try {
+      if (loading) return;
       let imageUrl: string | undefined;
       if (selectedImage) {
         imageUrl = await uploadImage(selectedImage);
@@ -122,10 +120,9 @@ export default function RecipeForm() {
       setCurrentIngredient("");
       reset();
 
-      console.log(post);
-
       await createPost(post);
       Alert.alert("Recipe created successfully!");
+
       router.push("/(tabs)");
     } catch (error) {
       Alert.alert("Error creating recipe");
@@ -258,7 +255,7 @@ export default function RecipeForm() {
           style={styles.submitButton}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text style={styles.submitButtonText}>Submit Recipe</Text>
+          <Text style={styles.submitButtonText}>{loading ? 'Loading' : 'Submit Recipe'}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

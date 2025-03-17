@@ -16,9 +16,13 @@ import { supabase } from "@/lib/supabase";
 import { usePostStore } from "@/lib/PostStore";
 import { ScrollView } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import Constants from "expo-constants";
+import { extractFilePathFromUrl } from "@/utils/extractFilePathFromUrl";
+
+const DEFAULT_IMAGE_URL = Constants.expoConfig?.extra?.DEFAULT_POST_IMAGE;
 
 const recipeSchema = z.object({
-    title: z.string().min(1, "Title is required"),
+    title: z.string().min(2, "Title is required"),
     description: z.string().min(1, "Description is required"),
     image_url: z.string().optional(),
     ingredients: z
@@ -35,10 +39,9 @@ export default function RecipeFormEdit() {
     const [uploading, setUploading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [postId, setPostId] = useState<string | null>(null);
-    const { createPost, updatePost, findPost } = usePostStore();
+    const { createPost, updatePost, findPost, loading } = usePostStore();
 
     const currentPost = findPost(id as string);
-
     useEffect(() => {
         if (id) {
             setPostId(id as string);
@@ -102,16 +105,32 @@ export default function RecipeFormEdit() {
         }
     };
 
-    const uploadImage = async (uri: string) => {
+    const imageUpdate = async (uri: string) => {
         setUploading(true);
         try {
+            // check first if image if default image
+            if (uri === DEFAULT_IMAGE_URL) {
+                return uri;
+            }
+
+            // upload image to storage
             const { data, error } = await supabase.storage
                 .from("post_image")
                 .upload(`${Date.now()}.jpg`, { uri, type: "image/jpeg" } as any);
 
+            // delete old image
+            if (currentPost?.image_url && currentPost?.image_url !== DEFAULT_IMAGE_URL) {
+                const oldPath = extractFilePathFromUrl(currentPost.image_url);
+                const { data: deleteImage, error } = await supabase.storage
+                    .from("post_image")
+                    .remove([oldPath]);
+            }
+
             if (error) throw error;
             const url = supabase.storage.from("post_image").getPublicUrl(data.path);
+
             setValue("image_url", url.data.publicUrl);
+
             return url.data.publicUrl;
         } catch (error: any) {
             Alert.alert("Error uploading image", error?.message || "An error occurred");
@@ -123,13 +142,11 @@ export default function RecipeFormEdit() {
 
     const onSubmit = async (data: RecipeFormData) => {
         try {
-            let imageUrl = data.image_url;
+            if (loading) return;
 
+            let imageUrl = data.image_url;
             if (selectedImage && !selectedImage.startsWith("https://")) {
-                imageUrl = await uploadImage(selectedImage);
-            } else {
-                console.log("Image URL: ", imageUrl);
-                console.log("no image uploaded");
+                imageUrl = await imageUpdate(selectedImage);
             }
 
             const post = {
@@ -147,7 +164,7 @@ export default function RecipeFormEdit() {
                 Alert.alert("Recipe created successfully!");
             }
 
-            router.push("/(tabs)");
+            router.push("/(tabs)/profile");
         } catch (error) {
             Alert.alert("Error saving recipe");
         } finally {
@@ -275,14 +292,14 @@ export default function RecipeFormEdit() {
                     style={styles.submitButton}
                     onPress={handleSubmit(onSubmit)}
                 >
-                    <Text style={styles.submitButtonText}>
-                        {postId ? "Update Recipe" : "Submit Recipe"}
-                    </Text>
+                    <Text style={styles.submitButtonText}>{loading ? 'Loading' : 'Submit Recipe'}</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
     );
 }
+
+
 
 const styles = StyleSheet.create({
     contentContainer: {
