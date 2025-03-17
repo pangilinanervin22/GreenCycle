@@ -3,7 +3,7 @@ import "dotenv/config";
 export default {
     name: "GreenCycle",
     slug: "GreenCycle",
-    version: "1.0.1",
+    version: "1.0.2",
     orientation: "portrait",
     icon: "./assets/images/logo.png",
     scheme: "myapp",
@@ -49,3 +49,5 @@ export default {
         DEFAULT_POST_IMAGE: process.env.DEFAULT_POST_IMAGE,
     },
 };
+
+// eas build --platform android --profile preview
