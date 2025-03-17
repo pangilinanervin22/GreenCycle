@@ -15,6 +15,7 @@ import { Image } from "expo-image";
 import { Link, router } from "expo-router";
 import Colors from "@/constants/Colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import DefaultLoading from "@/components/DefaultLoading";
 
 const SignupSchema = z
   .object({
@@ -157,7 +158,7 @@ export default function Signup() {
       <View style={styles.buttonContainer}>
         <Pressable onPress={handleSubmit(onSubmit)} style={styles.button}>
           {loading ? (
-            <ActivityIndicator color={Colors.light.text} />
+            <DefaultLoading loading={loading} />
           ) : (
             <Text style={styles.buttonText}>Sign Up</Text>
           )}
