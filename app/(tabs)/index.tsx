@@ -26,8 +26,6 @@ export default function TabOneScreen() {
     }, [])
   );
 
-  console.log("render", loading);
-
   const filteredPosts = posts.filter((post) =>
     post.status === "ACCEPTED" && post.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -84,7 +82,7 @@ export default function TabOneScreen() {
             {filteredPosts.map((post, index) => (
               <Pressable
                 key={index}
-                onPress={() => router.push(`/(tabs)/${post.id}`)}
+                onPress={() => router.push(`/(tabs)/post/${post.id}`)}
                 style={styles.postContainer}
               >
                 <Image
