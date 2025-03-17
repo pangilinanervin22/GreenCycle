@@ -1,15 +1,22 @@
 import { StyleSheet, ScrollView, TouchableOpacity, View, Text } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useAuthStore } from "@/lib/AuthStore";
-import { usePostStore } from "@/lib/PostStore";
+import { PostStatus, usePostStore } from "@/lib/PostStore";
 import { Image } from "expo-image";
+import { useCallback } from "react";
 
 export default function ProfilePage() {
     const router = useRouter();
     const { user, logout } = useAuthStore();
-    const { posts } = usePostStore();
+    const { posts, deletePost, fetchPosts } = usePostStore();
 
     const userPosts = posts.filter((post) => post.author_id === user?.id);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchPosts();
+        }, [])
+    );
 
     return (
         <ScrollView style={styles.container}>
@@ -17,43 +24,71 @@ export default function ProfilePage() {
                 <Text style={styles.title}>Welcome, {user?.name}</Text>
                 <Text style={styles.info}>{user?.description}</Text>
 
-                <View style={styles.buttonContainer}>
+                {/* Profile Actions */}
+                <View style={styles.profileActions}>
                     <TouchableOpacity
-                        style={[styles.button, styles.editButton]}
-                        onPress={() => router.push(`/(tabs)/profile/${user?.id}`)}
+                        style={styles.profileEditButton}
+                        onPress={() => router.push(`/(tabs)/profile/edit`)}
                     >
-                        <Text style={styles.buttonText}>Edit Profile</Text>
+                        <Text style={styles.profileButtonText}>Edit Profile</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.button, styles.logoutButton]}
+                        style={styles.profileLogoutButton}
                         onPress={logout}
                     >
-                        <Text style={styles.buttonText}>Logout</Text>
+                        <Text style={[styles.profileButtonText, styles.logoutButtonText]}>Log Out</Text>
                     </TouchableOpacity>
                 </View>
 
                 <Text style={styles.subTitle}>Your Posts</Text>
                 {userPosts.length > 0 ? (
-                    userPosts.map((post) => (
-                        <TouchableOpacity
-                            key={post.id}
-                            style={styles.postCard}
-                            onPress={() => router.push(`/(tabs)/create/${post.id}`)}
-                        >
-                            {post.image_url && (
-                                <Image
-                                    source={{ uri: post.image_url }}
-                                    style={styles.postImage}
-                                    contentFit="cover"
-                                    cachePolicy={'memory'}
-                                />
-                            )}
-                            <Text style={styles.postTitle}>{post.title}</Text>
-                            <Text style={styles.postDescription}>
-                                {post.description}
-                            </Text>
-                        </TouchableOpacity>
-                    ))
+                    userPosts.map((post) => {
+                        const statusStyle = getStatusStyle(post.status);
+                        return (
+                            <View key={post.id} style={styles.postCard}>
+                                {post.image_url && (
+                                    <Image
+                                        source={{ uri: post.image_url }}
+                                        style={styles.postImage}
+                                        contentFit="cover"
+                                        cachePolicy={'memory-disk'}
+                                    />
+                                )}
+                                <View style={styles.titleContainer}>
+                                    <Text style={styles.postTitle}>{post.title}</Text>
+                                    <View style={[
+                                        styles.statusBadge,
+                                        { backgroundColor: statusStyle.backgroundColor }
+                                    ]}>
+                                        <Text style={[
+                                            styles.statusText,
+                                            { color: statusStyle.textColor }
+                                        ]}>
+                                            {post.status}
+                                        </Text>
+                                    </View>
+                                </View>
+                                <Text style={styles.postDescription}>
+                                    {post.description}
+                                </Text>
+                                {/* Post Actions */}
+                                <View style={styles.postActions}>
+                                    <TouchableOpacity
+                                        style={styles.postActionEdit}
+                                        onPress={() => router.push(`/(tabs)/create/${post.id}`)}
+                                    >
+                                        <Text style={styles.postActionText}>Edit Post</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.postActionDelete}
+                                        onPress={() => deletePost(post.id)}
+                                    >
+                                        <Text style={[styles.postActionText, styles.postActionDeleteText]}>Delete</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        );
+                    })
                 ) : (
                     <Text style={styles.emptyText}>
                         You have not created any posts yet.
@@ -63,6 +98,18 @@ export default function ProfilePage() {
         </ScrollView>
     );
 }
+
+const getStatusStyle = (status: PostStatus) => {
+    switch (status) {
+        case "ACCEPTED":
+            return { backgroundColor: "#d4edda", textColor: "#155724" };
+        case "REJECTED":
+            return { backgroundColor: "#f8d7da", textColor: "#721c24" };
+        case "REQUESTING":
+        default:
+            return { backgroundColor: "#fff3cd", textColor: "#856404" };
+    }
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -89,35 +136,33 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         maxWidth: 300,
     },
-    buttonContainer: {
+    profileActions: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        gap: 12,
         width: "100%",
         marginBottom: 24,
-        gap: 16, // Adds space between buttons
     },
-    button: {
-        flex: 1, // Ensures both buttons take equal width
-        paddingVertical: 12,
-        borderRadius: 30,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 3,
-        alignItems: "center",
-        justifyContent: "center",
+    profileEditButton: {
+        flex: 1,
+        paddingVertical: 14,
+        borderRadius: 12,
+        backgroundColor: "#FFFFFF",
+        borderWidth: 2,
+        borderColor: "#00512C",
     },
-    editButton: {
-        backgroundColor: "#00512C",
-    },
-    logoutButton: {
+    profileLogoutButton: {
+        flex: 1,
+        paddingVertical: 14,
+        borderRadius: 12,
         backgroundColor: "#AF3030",
     },
-    buttonText: {
-        color: "white",
+    profileButtonText: {
         fontSize: 16,
         fontWeight: "600",
+        textAlign: "center",
+    },
+    logoutButtonText: {
+        color: "white",
     },
     subTitle: {
         fontSize: 22,
@@ -146,16 +191,66 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         backgroundColor: "#e0e0e0",
     },
+    titleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
     postTitle: {
         fontSize: 18,
         fontWeight: "600",
         color: "#1a1a1a",
-        marginBottom: 4,
+        flexShrink: 1,
+        marginRight: 8,
+    },
+    statusBadge: {
+        paddingVertical: 4,
+        paddingHorizontal: 12,
+        borderRadius: 15,
+        alignSelf: 'flex-start',
+    },
+    statusText: {
+        fontSize: 12,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     postDescription: {
         fontSize: 14,
         color: "#666",
         lineHeight: 20,
+        marginBottom: 12,
+    },
+    postActions: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 8,
+        justifyContent: 'flex-end',
+    },
+    postActionEdit: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        backgroundColor: "rgba(0, 81, 44, 0.1)",
+        width: '35%',
+    },
+    postActionDelete: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        backgroundColor: "rgba(175, 48, 48, 0.1)",
+        width: '35%',
+    },
+    postActionText: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#00512C",
+        width: "100%",
+        textAlign: "center",
+    },
+    postActionDeleteText: {
+        color: "#AF3030",
     },
     emptyText: {
         textAlign: "center",

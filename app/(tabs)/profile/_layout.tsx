@@ -18,6 +18,12 @@ export default function Profile() {
                 }}
             />
             <Stack.Screen
+                name="edit"
+                options={{
+                    header: () => null,
+                }}
+            />
+            <Stack.Screen
                 name="[id]"
                 options={{
                     header: () => null,
