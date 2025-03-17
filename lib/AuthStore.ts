@@ -5,7 +5,7 @@ import { supabase } from "./supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 
-interface User {
+export interface User {
     id?: string;
     email: string;
     name: string;
