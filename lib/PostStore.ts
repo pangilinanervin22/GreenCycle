@@ -4,6 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
 import { useAuthStore } from './AuthStore';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+import { extractFilePathFromUrl } from "@/utils/extractFilePathFromUrl";
+
+const DEFAULT_IMAGE_URL = Constants.expoConfig?.extra?.DEFAULT_POST_IMAGE;
 
 export type PostStatus = "REQUESTING" | "ACCEPTED" | "REJECTED";
 export interface Post {
@@ -43,7 +47,6 @@ interface PostState {
 }
 
 const isWeb = Platform.OS === 'web';
-
 
 export const usePostStore = create<PostState>()(
     persist(
@@ -88,8 +91,8 @@ export const usePostStore = create<PostState>()(
             createPost: async (content: PostAddOrEdit) => {
                 const { user } = useAuthStore.getState(); // Access auth store
                 if (!user) throw new Error('User not authenticated');
-
                 set({ loading: true });
+
                 try {
                     const createdPost = {
                         author_id: user.id,
@@ -123,6 +126,18 @@ export const usePostStore = create<PostState>()(
             deletePost: async (postId: string) => {
                 set({ loading: true });
                 try {
+                    // Delete image from storage
+                    const imageUrl = get().posts.find((post) => post.id === postId)?.image_url;
+
+                    if (DEFAULT_IMAGE_URL !== imageUrl) {
+                        const filePath = extractFilePathFromUrl(imageUrl || '');
+                        const { error: ImageError } = await supabase.storage
+                            .from('post_image')
+                            .remove([filePath]);
+
+                        if (ImageError) throw ImageError;
+                    }
+
                     // Delete the post from the main table
                     const { error } = await supabase
                         .from('recycle_post')
@@ -130,13 +145,6 @@ export const usePostStore = create<PostState>()(
                         .eq('id', postId);
 
                     if (error) throw error;
-
-                    // Also remove all likes for that post from the likes table
-                    const { error: likesError } = await supabase
-                        .from('likes')
-                        .delete()
-                        .eq('post_id', postId);
-                    if (likesError) throw likesError;
 
                     set({ posts: get().posts.filter((post) => post.id !== postId) });
                 } finally {
@@ -165,7 +173,7 @@ export const usePostStore = create<PostState>()(
 
                     set({
                         posts: get().posts.map(post =>
-                            post.id === postId ? { ...JSON.parse(JSON.stringify(content)) } : post
+                            post.id === postId ? { ...JSON.parse(JSON.stringify(updatePost)) } : post
                         ),
                     });
                 } finally {
