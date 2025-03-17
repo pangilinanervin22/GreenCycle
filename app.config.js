@@ -46,5 +46,6 @@ export default {
         supabaseUrl: process.env.SUPABASE_URL,
         supabaseKey: process.env.SUPABASE_KEY,
         SAMPLE_ENVIRONMENT: process.env.SAMPLE_ENVIRONMENT,
+        DEFAULT_POST_IMAGE: process.env.DEFAULT_POST_IMAGE,
     },
 };
