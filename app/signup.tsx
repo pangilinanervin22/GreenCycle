@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +10,6 @@ import {
   Alert,
   StyleSheet,
   Text,
-  ActivityIndicator,
 } from "react-native";
 import { Image } from "expo-image";
 import { Link, router } from "expo-router";
@@ -33,6 +33,8 @@ const SignupSchema = z
 
 export default function Signup() {
   const { signup, loading } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
     control,
     handleSubmit,
@@ -120,15 +122,27 @@ export default function Signup() {
         control={control}
         name="password"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            secureTextEntry
-            placeholder="Enter password"
-            style={styles.input}
-            placeholderTextColor={"#00512C"}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              secureTextEntry={!showPassword}
+              placeholder="Enter password"
+              style={[styles.input, { paddingRight: 35 }]}
+              placeholderTextColor={"#00512C"}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+            <Pressable
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <FontAwesome
+                name={showPassword ? "eye-slash" : "eye"}
+                size={20}
+                color="#00512C"
+              />
+            </Pressable>
+          </View>
         )}
       />
       {errors.password && (
@@ -140,15 +154,27 @@ export default function Signup() {
         control={control}
         name="confirmPassword"
         render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            secureTextEntry
-            placeholder="Confirm password"
-            style={styles.input}
-            placeholderTextColor={"#00512C"}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              secureTextEntry={!showConfirmPassword}
+              placeholder="Confirm password"
+              style={[styles.input, { paddingRight: 35 }]}
+              placeholderTextColor={"#00512C"}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+            <Pressable
+              style={styles.eyeIcon}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              <FontAwesome
+                name={showConfirmPassword ? "eye-slash" : "eye"}
+                size={20}
+                color="#00512C"
+              />
+            </Pressable>
+          </View>
         )}
       />
       {errors.confirmPassword && (
@@ -172,7 +198,7 @@ export default function Signup() {
       </View>
       <View style={styles.imageContainer}>
         <Image
-          source={require("../assets/images/signupbg.png")} // Replace with your actual image
+          source={require("../assets/images/signupbg.png")}
           style={styles.backgroundImage}
           contentFit="fill"
           cachePolicy={"memory-disk"}
@@ -204,17 +230,12 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
   },
-  backButtonText: {
-    fontSize: 18,
-    color: "#00512C",
-    fontWeight: "bold",
-  },
   logo: {
     width: 60,
     height: 60,
   },
   welcomeContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -246,6 +267,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: "#00512C",
     backgroundColor: "transparent",
+  },
+  passwordContainer: {
+    position: "relative",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 10,
+    top: 10,
+    padding: 5,
   },
   buttonContainer: {
     width: "50%",
