@@ -71,7 +71,6 @@ export default function AdminMainLayout() {
           <Pressable
             key={status}
             style={[styles.card, { backgroundColor: statusColors[status as keyof typeof statusColors] }]}
-            onPress={() => router.push(`/admin/posts?filter=${status.toLowerCase()}`)}
           >
             <FontAwesome
               name={statusIcons[status as keyof typeof statusIcons] as any}
