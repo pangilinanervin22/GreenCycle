@@ -36,27 +36,31 @@ export default function PostDetail() {
     return (
         <>
             <ScrollView contentContainerStyle={styles.container}>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)')}>
                     <FontAwesome name="arrow-left" size={20} color="#00512C" />
                 </TouchableOpacity>
                 <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} cachePolicy="memory-disk" />
                 <View style={styles.allcontent}>
                     <Text style={styles.title}>{currentPost.title}</Text>
-                    <TouchableOpacity
-                        style={styles.authorContainer}
-                        onPress={() => router.push(`/(tabs)/profile/${currentPost.author_id}`)}
-                    >
-                        <FontAwesome name="user" size={16} color="#00512C" style={styles.icon} />
-                        <Text style={styles.subtitle}>{currentPost.author_name}</Text>
-                    </TouchableOpacity>
-                    <View style={styles.likesContainer}>
-                        <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
-                            <FontAwesome name="heart" size={16} color="#00512C" style={styles.icon} />
-                            <Text style={styles.subtitlelikes}>{currentPost.likes.count || 0}</Text>
+                    <View style={styles.profileAndLikesContainer}>
+                        <TouchableOpacity
+                            style={styles.authorContainer}
+                            onPress={() => router.push(`/(tabs)/profile/${currentPost.author_id}`)}
+                        >
+                            <FontAwesome name="user" size={16} color="#00512C" style={styles.icon} />
+                            <Text style={styles.subtitleAuthor}>{currentPost.author_name}</Text>
                         </TouchableOpacity>
+                        <View style={styles.likesContainer}>
+                            <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
+                                <FontAwesome name="heart" size={16} color="#00512C" style={styles.icon} />
+                                <Text style={styles.subTitleLikes}>{currentPost.likes.count || 0}</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     <Text style={styles.description}>{currentPost.description}</Text>
-                    <Text style={styles.subtitleIngredients}>Ingredients:</Text>
+                    <Text style={styles.subTitle}>Procedure</Text>
+                    <Text style={styles.description}>{currentPost.procedure}</Text>
+                    <Text style={styles.subTitle}>Ingredients:</Text>
                     {currentPost.ingredients?.map((ingredient, i) => (
                         <Text key={i} style={styles.ingredientItem}>
                             {ingredient}
@@ -114,18 +118,21 @@ const styles = StyleSheet.create({
         color: '#00512C',
         textAlign: 'left',
     },
+    profileAndLikesContainer: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        paddingLeft: 8,
+        marginTop: 5,
+        width: '100%',
+    },
     authorContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 5,
         color: '#00512C',
-        paddingLeft: 8,
     },
     likesContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingLeft: 8,
-        marginTop: 5,
         color: '#00512C',
     },
     likeButton: {
@@ -135,18 +142,18 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 8,
     },
-    subtitle: {
+    subtitleAuthor: {
         fontSize: 16,
         paddingLeft: 8,
         color: '#333',
     },
-    subtitlelikes: {
+    subTitleLikes: {
         fontSize: 16,
         fontWeight: '600',
         paddingLeft: 8,
         color: '#333',
     },
-    subtitleIngredients: {
+    subTitle: {
         fontSize: 20,
         fontWeight: '600',
         paddingLeft: 8,

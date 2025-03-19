@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
     height: 40,
     color: "#00512C",
     outlineColor: "#00512C",
-    outline: "none",
   },
   scrollContainer: {
     width: "100%",

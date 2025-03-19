@@ -3,7 +3,7 @@ import { persist, StorageValue } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
 import { useAuthStore } from './AuthStore';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { extractFilePathFromUrl } from "@/utils/extractFilePathFromUrl";
 
@@ -16,13 +16,15 @@ export interface Post {
     author_id: string;
     author_name: string;
     description: string;
+    image_url: string;
+    ingredients: string[];
+    created_at: string;
+    procedure: string;
     likes: {
         count: number;
         users: string[];
     };
-    image_url: string;
-    ingredients: string[];
-    created_at: string;
+
     status: PostStatus;
     synced: boolean;
 }
@@ -32,6 +34,7 @@ export interface PostAddOrEdit {
     description: string;
     image_url?: string;
     ingredients: string[];
+    procedure: string;
 }
 
 interface PostState {
@@ -99,6 +102,7 @@ export const usePostStore = create<PostState>()(
                         ingredients: [...content.ingredients],
                         description: content.description,
                         title: content.title,
+                        procedure: content.procedure,
                         image_url: content.image_url,
                         status: "REQUESTING"
                     };
@@ -147,6 +151,9 @@ export const usePostStore = create<PostState>()(
                     if (error) throw error;
 
                     set({ posts: get().posts.filter((post) => post.id !== postId) });
+                }
+                catch (error) {
+                    Alert.alert('Error', 'Failed to delete post. Please try again later.');
                 } finally {
                     set({ loading: false });
                 }

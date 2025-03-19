@@ -2,7 +2,6 @@ import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Alert } from 'rea
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { usePostStore } from '@/lib/PostStore';
 import { PostStatus } from '@/lib/PostStore';
@@ -55,7 +54,6 @@ export default function PostDetail() {
                         </Text>
                     </View>
 
-
                     <View style={styles.adminControls}>
                         <Text style={styles.modalatorTitle}>Admin Controls</Text>
                         <View style={styles.statusButtonsContainer}>
@@ -80,7 +78,6 @@ export default function PostDetail() {
                         </View>
                     </View>
 
-
                     <View style={styles.modalatorInfo}>
                         <Text style={styles.infoTitle}>Status Information:</Text>
                         <Text style={styles.infoText}>
@@ -95,16 +92,18 @@ export default function PostDetail() {
                 <Text style={styles.title}>{currentPost.title}</Text>
                 <View style={styles.authorContainer}>
                     <FontAwesome name="user" size={16} color="#00512C" style={styles.icon} />
-                    <Text style={styles.subtitle}>{currentPost.author_name}</Text>
+                    <Text style={styles.authorTitle}>{currentPost.author_name}</Text>
                 </View>
                 <View style={styles.likesContainer}>
                     <View style={styles.likeButton}>
                         <FontAwesome name="heart" size={16} color="#00512C" style={styles.icon} />
-                        <Text style={styles.subtitlelikes}>{currentPost.likes.count || 0}</Text>
+                        <Text style={styles.subTitleLikes}>{currentPost.likes.count || 0}</Text>
                     </View>
                 </View>
                 <Text style={styles.description}>{currentPost.description}</Text>
-                <Text style={styles.subtitleIngredients}>Ingredients:</Text>
+                <Text style={styles.subTitle}>Procedure</Text>
+                <Text style={styles.description}>{currentPost.procedure}</Text>
+                <Text style={styles.subTitle}>Ingredients</Text>
                 {currentPost.ingredients?.map((ingredient, i) => (
                     <Text key={i} style={styles.ingredientItem}>
                         {ingredient}
@@ -191,18 +190,25 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 8,
     },
-    subtitle: {
+    authorTitle: {
         fontSize: 16,
         paddingLeft: 8,
         color: '#333',
     },
-    subtitlelikes: {
+    subTitleLikes: {
         fontSize: 16,
         fontWeight: '600',
         paddingLeft: 8,
         color: '#333',
     },
-    subtitleIngredients: {
+    subTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        paddingLeft: 8,
+        marginTop: 10,
+        color: '#00512C',
+    },
+    subtitleProcedure: {
         fontSize: 20,
         fontWeight: '600',
         paddingLeft: 8,
@@ -225,13 +231,10 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 8,
         paddingVertical: 15,
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.6)',
         borderRadius: 8,
         backgroundColor: '#fff',
         padding: 8,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
     },
     statusSection: {
         marginBottom: 20,

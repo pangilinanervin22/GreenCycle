@@ -18,6 +18,15 @@ export default function ProfilePage() {
         }, [])
     );
 
+    // create delete post function
+    function clickDeletePost(id: string) {
+        try {
+            deletePost(id);
+        } catch (error) {
+            alert("Failed to delete post. Please try again later.");
+        }
+    }
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.innerContainer}>
@@ -81,7 +90,7 @@ export default function ProfilePage() {
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.postActionDelete}
-                                        onPress={() => deletePost(post.id)}
+                                        onPress={() => clickDeletePost(post.id)}
                                     >
                                         <Text style={[styles.postActionText, styles.postActionDeleteText]}>Delete</Text>
                                     </TouchableOpacity>
