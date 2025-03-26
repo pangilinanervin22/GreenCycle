@@ -3,7 +3,7 @@ import "dotenv/config";
 export default {
     name: "GreenCycle",
     slug: "GreenCycle",
-    version: "1.0.2",
+    version: "1.1.0",
     orientation: "portrait",
     icon: "./assets/images/logo.png",
     scheme: "myapp",
