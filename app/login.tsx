@@ -40,13 +40,9 @@ export default function Login() {
     initializeAuth();
   }, []);
 
-  if (loading) {
-    return <DefaultLoading loading />;
-  }
-
-  if (user) {
-    return <Redirect href="/(tabs)" />;
-  }
+  if (loading) return <DefaultLoading loading={loading} />;
+  if (user && user.role === "admin") return <Redirect href="/(admin)" />;
+  if (user && user.role === "user") return <Redirect href="/(tabs)" />;
 
   const onSubmit = async (data: LoginFormData) => {
     try {

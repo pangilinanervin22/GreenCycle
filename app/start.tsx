@@ -1,10 +1,18 @@
 import { View, StyleSheet, Text } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, Redirect } from 'expo-router';
 import { Image } from 'expo-image';
+import { useAuthStore } from '@/lib/AuthStore';
+import DefaultLoading from '@/components/DefaultLoading';
 
 
 
 export default function StartTab() {
+    const { login, user, loading, initializeAuth } = useAuthStore();
+
+    if (loading) return <DefaultLoading loading={loading} />;
+    if (user && user.role === "admin") return <Redirect href="/(admin)" />;
+    if (user && user.role === "user") return <Redirect href="/(tabs)" />;
+
     return (
         <View style={styles.container}>
             <Image

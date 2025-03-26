@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import {
   Text,
 } from "react-native";
 import { Image } from "expo-image";
-import { Link, router } from "expo-router";
+import { Link, Redirect, router } from "expo-router";
 import Colors from "@/constants/Colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DefaultLoading from "@/components/DefaultLoading";
@@ -32,7 +32,7 @@ const SignupSchema = z
   });
 
 export default function Signup() {
-  const { signup, loading } = useAuthStore();
+  const { user, signup, loading, initializeAuth } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
@@ -57,6 +57,15 @@ export default function Signup() {
       );
     }
   };
+
+
+  useEffect(() => {
+    initializeAuth();
+  }, []);
+
+  if (loading) return <DefaultLoading loading={loading} />;
+  if (user && user.role === "admin") return <Redirect href="/(admin)" />;
+  if (user && user.role === "user") return <Redirect href="/(tabs)" />;
 
   return (
     <View style={styles.container}>
