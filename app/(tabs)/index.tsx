@@ -7,7 +7,6 @@ import {
   Pressable,
   TextInput,
   ActivityIndicator,
-  FlatList,
 } from "react-native";
 import { router } from "expo-router";
 import { usePostStore } from "@/lib/PostStore";
@@ -19,6 +18,7 @@ export default function TabOneScreen() {
   const { fetchPosts, posts, loading } = usePostStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useFocusEffect(
     useCallback(() => {
@@ -26,9 +26,18 @@ export default function TabOneScreen() {
     }, [])
   );
 
-  const filteredPosts = posts.filter((post) =>
-    post.status === "ACCEPTED" && post.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPosts = posts
+    .filter(
+      (post) =>
+        post.status === "PUBLISHED" &&
+        post.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      const titleA = a.title.toLowerCase();
+      const titleB = b.title.toLowerCase();
+      if (sortOrder === "asc") return titleA.localeCompare(titleB);
+      else return titleB.localeCompare(titleA);
+    });
 
   return (
     <View style={styles.container}>
@@ -62,9 +71,47 @@ export default function TabOneScreen() {
           onChangeText={setSearchTerm}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          underlineColorAndroid="transparent" // Add this for Android
-          selectionColor="#1CA365" // Optional: customize cursor color
+          underlineColorAndroid="transparent"
+          selectionColor="#1CA365"
         />
+      </View>
+
+      <View style={styles.sortContainer}>
+        <Text style={styles.sortLabel}>Sort by title:</Text>
+        <View style={styles.sortButtons}>
+          <Pressable
+            onPress={() => setSortOrder("asc")}
+            style={[
+              styles.sortButton,
+              sortOrder === "asc" && styles.activeSortButton,
+            ]}
+          >
+            <Text
+              style={[
+                styles.sortButtonText,
+                sortOrder === "asc" && styles.activeSortButtonText,
+              ]}
+            >
+              ASC
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setSortOrder("desc")}
+            style={[
+              styles.sortButton,
+              sortOrder === "desc" && styles.activeSortButton,
+            ]}
+          >
+            <Text
+              style={[
+                styles.sortButtonText,
+                sortOrder === "desc" && styles.activeSortButtonText,
+              ]}
+            >
+              DESC
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollContainer}>
@@ -92,14 +139,25 @@ export default function TabOneScreen() {
                   cachePolicy="memory"
                 />
                 <Text style={styles.postTitle}>{post.title}</Text>
-                <View style={styles.likesContainer}>
-                  <FontAwesome
-                    name="heart"
-                    size={16}
-                    color="#00512C"
-                    style={styles.likeIcon}
-                  />
-                  <Text style={styles.likesText}>{post.likes.count}</Text>
+                <View style={styles.engagementContainer}>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <FontAwesome
+                      name="heart"
+                      size={16}
+                      color="#00512C"
+                      style={styles.likeIcon}
+                    />
+                    <Text style={styles.likesText}>{post.likes.count}</Text>
+                  </View>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <FontAwesome
+                      name="star"
+                      size={16}
+                      color="#00512C"
+                      style={styles.starIcon}
+                    />
+                    <Text style={styles.likesText}>{post.rating.average}</Text>
+                  </View>
                 </View>
               </Pressable>
             ))}
@@ -110,11 +168,11 @@ export default function TabOneScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#fff",
     marginBottom: 50,
     width: "100%",
   },
@@ -162,6 +220,40 @@ const styles = StyleSheet.create({
     color: "#00512C",
     outlineColor: "#00512C",
   },
+  sortContainer: {
+    width: "90%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  sortLabel: {
+    fontSize: 16,
+    color: "#00512C",
+    fontWeight: "bold",
+  },
+  sortButtons: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  sortButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#00512C",
+  },
+  sortButtonText: {
+    color: "#00512C",
+    fontSize: 14,
+  },
+  activeSortButton: {
+    backgroundColor: "#00512C",
+  },
+  activeSortButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   scrollContainer: {
     width: "100%",
   },
@@ -194,14 +286,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     width: "100%",
+    color: "#00512C",
   },
-  likesContainer: {
+  engagementContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-evenly",
+    width: "100%",
     marginVertical: 4,
   },
   likeIcon: {
     marginRight: 6,
+  },
+  starIcon: {
+    marginRight: 6,
+    color: "#FFD700",
   },
   likesText: {
     color: "#333",

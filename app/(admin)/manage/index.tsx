@@ -1,13 +1,13 @@
 import { ScrollView, StyleSheet, Text, View, Pressable, ActivityIndicator, TextInput, TouchableOpacity } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 
 // Status configuration
 const statusConfig = {
-  ACCEPTED: {
-    label: 'ACCEPTED',
+  PUBLISHED: {
+    label: 'PUBLISHED',
     backgroundColor: '#e8f5e9',
     textColor: '#2e7d32'
   },

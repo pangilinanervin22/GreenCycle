@@ -59,7 +59,7 @@ export default function PostDetail() {
                         <View style={styles.statusButtonsContainer}>
                             <TouchableOpacity
                                 style={[styles.statusButton, styles.acceptedButton]}
-                                onPress={() => handleStatusChange('ACCEPTED')}
+                                onPress={() => handleStatusChange('PUBLISHED')}
                             >
                                 <Text style={styles.buttonText}>ACCEPT</Text>
                             </TouchableOpacity>
@@ -116,7 +116,7 @@ export default function PostDetail() {
 
 const getStatusStyle = (status: string) => {
     switch (status) {
-        case 'ACCEPTED': return styles.acceptedStatus;
+        case 'PUBLISHED': return styles.acceptedStatus;
         case 'REQUESTING': return styles.requestingStatus;
         case 'REJECTED': return styles.rejectedStatus;
         default: return styles.defaultStatus;

@@ -4,6 +4,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { usePostStore } from '@/lib/PostStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useCallback } from 'react';
+import { StarRating } from '@/components/StarRating';
 
 export default function PostDetail() {
     const { id } = useLocalSearchParams();
@@ -40,8 +41,17 @@ export default function PostDetail() {
                     <FontAwesome name="arrow-left" size={20} color="#00512C" />
                 </TouchableOpacity>
                 <Image style={styles.image} contentFit="cover" source={{ uri: currentPost.image_url }} cachePolicy="memory-disk" />
-                <View style={styles.allcontent}>
+                <View style={styles.allContent}>
                     <Text style={styles.title}>{currentPost.title}</Text>
+                    <View style={styles.ratingContainer}>
+                        <StarRating
+                            rating={currentPost.rating.average || 0}
+                            onRate={() => router.push(`/(tabs)/post/${currentPost.id}/ratings`)}
+                        />
+                        <Text style={styles.ratingText}>
+                            {currentPost.rating.total > 0 ? currentPost.rating.average.toFixed(1) : 'No ratings yet'} ({currentPost.rating.total} ratings)
+                        </Text>
+                    </View>
                     <View style={styles.profileAndLikesContainer}>
                         <TouchableOpacity
                             style={styles.authorContainer}
@@ -76,8 +86,8 @@ const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 5,
         paddingVertical: 15,
-        backgroundColor: '#f5f5f5',
         paddingBottom: 100,
+        backgroundColor: '#fff',
     },
     backButton: {
         position: 'absolute',
@@ -97,8 +107,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
     },
-    allcontent: {
-        backgroundColor: '#fff',
+    allContent: {
+        backgroundColor: '#e4f0e9',
         padding: 16,
         borderRadius: 30,
         marginTop: -60,
@@ -117,6 +127,17 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         color: '#00512C',
         textAlign: 'left',
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingLeft: 8,
+        marginVertical: 10,
+    },
+    ratingText: {
+        marginLeft: 8,
+        fontSize: 16,
+        color: '#666',
     },
     profileAndLikesContainer: {
         flexDirection: 'column',
@@ -176,9 +197,13 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 8,
         paddingVertical: 15,
-        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.6)',
         borderRadius: 8,
         backgroundColor: '#fff',
         padding: 8,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        shadowOffset: { width: 0, height: 2 },
     },
 });

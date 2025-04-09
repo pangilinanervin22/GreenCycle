@@ -25,7 +25,7 @@ export default function PostLikesLayout() {
 
   const likedPosts = posts.filter(
     (post) =>
-      post.status === "ACCEPTED" && post.likes.users.includes(user?.id ?? "")
+      post.status === "PUBLISHED" && post.likes.users.some((cur: any) => cur === user?.id)
   );
 
   return (
@@ -51,7 +51,13 @@ export default function PostLikesLayout() {
             style={styles.postImage}
             contentFit="cover"
           />
-          <Text style={[styles.title, styles.postTitle]}>{item.title}</Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={[styles.title, styles.postTitle]}>{item.title}</Text>
+            <View style={styles.postRating}>
+              <FontAwesome name="star" size={12} style={styles.starIcon} />
+              <Text style={styles.ratingText}>{item.rating.average}</Text>
+            </View>
+          </View>
           <Text style={styles.body}>{item.description}</Text>
         </Pressable>
       )}
@@ -64,7 +70,6 @@ export default function PostLikesLayout() {
 const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollContent: {
     flexGrow: 1,
@@ -79,7 +84,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
     color: "#00512C",
   },
@@ -99,7 +104,7 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     alignSelf: "center",
     marginBottom: 10,
-    padding: 10,
+    padding: 16,
     borderRadius: 8,
     backgroundColor: "#f8f8f8",
     shadowColor: "#000",
@@ -116,9 +121,25 @@ const styles = StyleSheet.create({
   },
   postTitle: {
     marginBottom: 4,
+    fontWeight: "bold",
+    fontSize: 20,
   },
   body: {
     color: "#333",
     fontSize: 16,
+  },
+  postRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  starIcon: {
+    marginRight: 4,
+    color: "#FFD700",
+    fontSize: 20,
+  },
+  ratingText: {
+    fontSize: 18,
+    color: "#555",
   },
 });

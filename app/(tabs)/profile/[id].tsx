@@ -6,6 +6,7 @@ import { Image } from "expo-image";
 import { useCallback, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import DefaultLoading from "@/components/DefaultLoading";
+import { FontAwesome } from "@expo/vector-icons";
 
 // Get user from supabase
 async function fetchUserProfile(userId: string): Promise<User> {
@@ -35,7 +36,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user } = useAuthStore();
 
-  const userPosts = posts.filter((post) => post.author_id === id && post.status === "ACCEPTED");
+  const userPosts = posts.filter((post) => post.author_id === id && post.status === "PUBLISHED");
 
   useFocusEffect(
     useCallback(() => {
@@ -104,16 +105,24 @@ export default function ProfilePage() {
                 )}
                 <View style={styles.titleContainer}>
                   <Text style={styles.postTitle}>{post.title}</Text>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: statusStyle.backgroundColor }
-                  ]}>
-                    <Text style={[
-                      styles.statusText,
-                      { color: statusStyle.textColor }
+                  <View style={styles.postIcons}>
+                    <View style={styles.postRating}>
+                      <FontAwesome name="star" size={12} style={styles.starIcon} />
+                      <Text>
+                        {post.rating.average}
+                      </Text>
+                    </View>
+                    <View style={[
+                      styles.statusBadge,
+                      { backgroundColor: statusStyle.backgroundColor }
                     ]}>
-                      {'✔️'}
-                    </Text>
+                      <Text style={[
+                        styles.statusText,
+                        { color: statusStyle.textColor }
+                      ]}>
+                        {'✔️'}
+                      </Text>
+                    </View>
                   </View>
                 </View>
                 <Text style={styles.postDescription}>
@@ -134,7 +143,7 @@ export default function ProfilePage() {
 
 const getStatusStyle = (status: PostStatus) => {
   switch (status) {
-    case "ACCEPTED":
+    case "PUBLISHED":
       return { backgroundColor: "#d4edda", textColor: "#155724" };
     case "REJECTED":
       return { backgroundColor: "#f8d7da", textColor: "#721c24" };
@@ -147,7 +156,6 @@ const getStatusStyle = (status: PostStatus) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
     marginBottom: "20%",
   },
   innerContainer: {
@@ -239,6 +247,23 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 20,
     marginBottom: 12,
+  },
+  postIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginRight: 8,
+    gap: 8,
+  },
+  postRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  starIcon: {
+    marginRight: 4,
+    color: "#FFD700",
+    fontSize: 16,
   },
   emptyText: {
     textAlign: "center",

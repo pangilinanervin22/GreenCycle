@@ -110,7 +110,7 @@ export default function ProfilePage() {
 
 const getStatusStyle = (status: PostStatus) => {
     switch (status) {
-        case "ACCEPTED":
+        case "PUBLISHED":
             return { backgroundColor: "#d4edda", textColor: "#155724" };
         case "REJECTED":
             return { backgroundColor: "#f8d7da", textColor: "#721c24" };
@@ -123,7 +123,6 @@ const getStatusStyle = (status: PostStatus) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f8f9fa",
         marginBottom: "20%",
     },
     innerContainer: {

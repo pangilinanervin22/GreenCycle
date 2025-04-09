@@ -8,7 +8,8 @@ export default function Profile() {
                 headerTitleStyle: {
                     color: 'black',
                     fontSize: 18
-                }
+                },
+                contentStyle: { backgroundColor: 'transparent' },
             }}
         >
             <Stack.Screen

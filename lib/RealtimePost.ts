@@ -18,7 +18,7 @@
 //     image_url: string;
 //     ingredients: string[];
 //     created_at: string;
-//     status: "REQUESTING" | "ACCEPTED" | "REJECTED";
+//     status: "REQUESTING" | "PUBLISHED" | "REJECTED";
 // }
 
 // export interface PostAddOrEdit {

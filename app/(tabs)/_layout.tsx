@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import { Animated, Pressable } from "react-native";
+import React, { useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Redirect, router, Tabs } from "expo-router";
 
@@ -41,17 +40,23 @@ export default function TabLayout() {
         tabBarStyle: {
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
-          backgroundColor: "white",
           height: 60,
           position: "absolute",
           paddingTop: 5,
+          backgroundColor: "white",
+
         },
         headerTitleAlign: "center",
         headerStyle: {
-          backgroundColor: "#ECE9E5",
+          backgroundColor: "white",
+
           elevation: 0,
           height: 70,
         },
+        sceneStyle: {
+          backgroundColor: "#e4f0e9",
+
+        }
       }}
     >
       <Tabs.Screen

@@ -128,6 +128,8 @@ export default function RecipeForm() {
 
       router.push("/(tabs)");
     } catch (error) {
+      console.log(error);
+
       Alert.alert("Error creating recipe");
     }
   };
@@ -243,6 +245,9 @@ export default function RecipeForm() {
             </View>
           ))}
         </View>
+        {errors.ingredients && (
+          <Text style={styles.error}>{errors.ingredients.message}</Text>
+        )}
 
         {/* Image Picker Section */}
         <View style={styles.imageContainer}>
@@ -285,7 +290,7 @@ export default function RecipeForm() {
           onPress={handleSubmit(onSubmit)}
         >
           <Text style={styles.submitButtonText}>
-            {loading ? 'Loading...' : 'Submit Recipe'}
+            {loading ? 'Loading' : 'Submit Recipe'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -300,7 +305,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
   },
   innerContainer: {
     padding: 12,

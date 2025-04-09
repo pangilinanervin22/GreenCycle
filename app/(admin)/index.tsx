@@ -24,7 +24,7 @@ export default function AdminMainLayout() {
   );
 
   const statusCounts = {
-    ACCEPTED: filteredPosts('ACCEPTED').length,
+    PUBLISHED: filteredPosts('PUBLISHED').length,
     REJECTED: filteredPosts('REJECTED').length,
     REQUESTING: filteredPosts('REQUESTING').length,
   };
@@ -130,19 +130,19 @@ export default function AdminMainLayout() {
 }
 
 const statusColors = {
-  ACCEPTED: '#d4edda',
+  PUBLISHED: '#d4edda',
   REJECTED: '#f8d7da',
   REQUESTING: '#fff3cd'
 };
 
 const statusIcons = {
-  ACCEPTED: 'check-circle',
+  PUBLISHED: 'check-circle',
   REJECTED: 'times-circle',
   REQUESTING: 'clock-o'
 };
 
 const statusLabels = {
-  ACCEPTED: 'Published',
+  PUBLISHED: 'Published',
   REJECTED: 'Rejected',
   REQUESTING: 'Pending'
 };

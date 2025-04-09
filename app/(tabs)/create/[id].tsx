@@ -19,7 +19,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import Constants from "expo-constants";
 import { extractFilePathFromUrl } from "@/utils/extractFilePathFromUrl";
 
-const DEFAULT_IMAGE_URL = Constants.expoConfig?.extra?.DEFAULT_POST_IMAGE;
+const DEFAULT_IMAGE_URL = Constants.expoConfig?.extra?.DEFAULT_POST_IMAGE || 'https://ogleiayxufndnwooxnfn.supabase.co/storage/v1/object/public/post_image/default.svg';
 
 const recipeSchema = z.object({
     title: z.string().min(2, "Title is required"),
@@ -336,7 +336,6 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: "#F8F8F8",
     },
     innerContainer: {
         padding: 12,
