@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     justifyContent: 'center',
-    wordWrap: 'break-word',
   },
   statusBadge: {
     borderRadius: 12,
