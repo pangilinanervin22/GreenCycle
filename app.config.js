@@ -7,7 +7,7 @@ export default {
     orientation: "portrait",
     icon: "./assets/images/logo.png",
     scheme: "myapp",
-    sdkVersion: "52.0.0",
+    sdkVersion: "53.0.0",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     jsEngine: "hermes",
