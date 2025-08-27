@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     color: "#00512C",
-    wordWrap: "break-word",
     width: "70%",
   },
   searchContainer: {
